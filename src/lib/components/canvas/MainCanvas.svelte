@@ -1,21 +1,21 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import * as PIXI from "pixi.js";
   import { Drawer } from "./canvasDrawer";
   
   let pixiCanvas: HTMLDivElement;
+  const app = new PIXI.Application()
 
   onMount(mount)
+  onDestroy(app.destroy);
 
   async function mount() {
     if (pixiCanvas! != null) {
-      const app = new PIXI.Application()
-
       await app.init({ background: '#1099bb', resizeTo: pixiCanvas });
 
       pixiCanvas.appendChild(app.canvas);
 
-      let drawer = new Drawer(app);
+      let drawer = new Drawer(app)
     }
   }
 
