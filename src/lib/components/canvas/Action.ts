@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 import * as TYPES from "../definitions";
-import { assertUnreachable } from "../utils";
+import { assertUnreachable } from "../utils/general";
 
 export class Action {
     private _actionType: TYPES.ActionType;
@@ -74,5 +74,21 @@ export class Action {
         graphics.stroke({ width: this._width, color: this._color });
 
         return graphics;
+    }
+
+    get get_actionType(): TYPES.ActionType {
+        return this._actionType;
+    }
+    get path(): TYPES.Coords[] {
+        return this._path;
+    }
+    get origin(): TYPES.Coords {
+        return this._origin;
+    }
+    get width(): number {
+        return this._width;
+    }
+    get color(): number {
+        return this._color;
     }
 }
