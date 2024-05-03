@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import * as PIXI from "pixi.js";
-  import { Drawer } from "./canvasDrawer";
+  import { CanvasHandler } from "./CanvasHandler";
   
   let pixiCanvas: HTMLDivElement;
   const app = new PIXI.Application()
@@ -15,7 +15,7 @@
 
       pixiCanvas.appendChild(app.canvas);
 
-      let drawer = new Drawer(app)
+      let drawer = new CanvasHandler(app)
     }
   }
 
