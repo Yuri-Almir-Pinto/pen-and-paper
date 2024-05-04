@@ -10,7 +10,7 @@ export class CanvasHandler implements IMouseEvents {
     private _isClick: boolean = false;
 
     currentMode: InteractionType = "DrawLine"
-    currentColor: number = 0x000000
+    currentColor: number = 0xFF0000
     currentWidth: number = 4
 
     constructor(app: Konva.Stage) {
@@ -44,6 +44,14 @@ export class CanvasHandler implements IMouseEvents {
 
     mouseClickHandler(event: Konva.KonvaEventObject<MouseEvent>) {
         this._isClick = true;
+        switch(this.currentMode) {
+            case "DrawLine":
+                if (this._actions.isDrawing)
+                    this._progressDrawing("Line", event, { isClick: true })
+                return;
+            default:
+                assertUnreachable(this.currentMode);
+        }
     }
 
     mouseDoubleClickHandler(event: Konva.KonvaEventObject<MouseEvent>) {
@@ -61,8 +69,6 @@ export class CanvasHandler implements IMouseEvents {
     }
 
     keydownHandler(event: KeyboardEvent) {
-        console.log(event);
-
         switch(event.code) {
             case "Escape":
                 this._isClick = false;
@@ -79,6 +85,9 @@ export class CanvasHandler implements IMouseEvents {
     }
 
     private _startDrawing(type: ActionType, event: Konva.KonvaEventObject<MouseEvent>) {
+        if (this._actions.isDrawing)
+            return;
+
         switch(type) {
             case "Line":
                 const { evt: { layerX: x, layerY: y } } = event;
@@ -104,12 +113,12 @@ export class CanvasHandler implements IMouseEvents {
 
                 if (isClick) {
                     this._actions.progressCurrentDrawing((action) => {
-                        action.path = [x, y, x, y]
+                        action.path = [...action.path, x, y];
                     })
                 }
 
                 this._actions.progressCurrentDrawing((action) => {
-                    action.path = [x, y]
+                    action.tempFinalPath = [x, y]
                 })
                 return;
             default:
@@ -120,8 +129,11 @@ export class CanvasHandler implements IMouseEvents {
     private _stopDrawing(type: ActionType) {
         switch(type) {
             case "Line":
-                if (!this._isClick)
+                if (!this._isClick) {
                     this._actions.commitCurrentDrawing();
+                }
+
+                console.log(this._actions);
                 return;
             default:
                 assertUnreachable(type);

@@ -28,12 +28,15 @@ export class ActionCollection {
     }
 
     commitCurrentDrawing() {
+        this._currentlyDrawing?.commit();
         this.addAction(this._currentlyDrawing)
         this._currentlyDrawing = undefined;
     }
 
     // Adiciona ação no layer, na lista, e desenha ela.
     addAction(...actions: SparseArray<ACTION.Action>) {
+        actions.forEach((action) => action?.commit());
+        
         this._actions.push(...actions);
 
         this.draw(...actions);

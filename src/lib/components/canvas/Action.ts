@@ -5,6 +5,7 @@ export class Action {
     private _actionType: ActionType;
     private _path: number[]
     private _origin: Coords
+    private _tempFinalPath?: Coords
     private _width: number
     private _color: number
     private _object: Konva.Shape
@@ -21,6 +22,11 @@ export class Action {
         this._object = this._create(data);
     }
 
+    commit() {
+        if (this._tempFinalPath != undefined)
+            this._path = [...this._path, ...this._tempFinalPath];
+    }
+
     private _create({ width, color, origin, path, actionType }: ActionData): Konva.Shape {
         switch(actionType) {
             case "Line":
@@ -34,7 +40,6 @@ export class Action {
             default:
                 assertUnreachable(actionType);
         }
-        
     }
 
     get get_actionType(): ActionType {
@@ -43,7 +48,7 @@ export class Action {
     get path(): number[] {
         return this._path;
     }
-    get origin(): Coords {
+    get origin(): number[] {
         return this._origin;
     }
     get width(): number {
@@ -57,7 +62,7 @@ export class Action {
     }
 
     set path(value: number[]) {
-        this._path = value;
+        this._path = [...value];
         switch(this._actionType) {
             case "Line":
                 (this._object as Konva.Line).points([...this._origin, ...value]);
@@ -76,7 +81,7 @@ export class Action {
         this._width = value;
         switch(this._actionType) {
             case "Line":
-                (this._object as Konva.Line).width(value);
+                (this._object as Konva.Line).width(this._width);
                 break;
         }
     }
@@ -86,6 +91,13 @@ export class Action {
             case "Line":
                 (this._object as Konva.Line).colorKey = value.toString(16);
                 break;
+        }
+    }
+    set tempFinalPath(value: Coords) {
+        this._tempFinalPath = value;
+        switch(this._actionType) {
+            case "Line":
+                (this._object as Konva.Line).points([...this._origin, ...this._path, ...this._tempFinalPath])
         }
     }
 }

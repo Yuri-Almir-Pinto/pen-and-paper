@@ -63,9 +63,7 @@ export class CanvasEventsHandler {
 
     private _handleMouseUp(event: Konva.KonvaEventObject<MouseEvent>) {
         const { evt: { layerX: x, layerY: y }} = event;
-        if (x.isWithingRange(this._downMousePostion[0], CanvasEventsHandler.acceptableRange) 
-            && y.isWithingRange(this._downMousePostion[1], CanvasEventsHandler.acceptableRange)
-            && Date.now() - this._sinceLastDown < 100) {
+        if (Date.now() - this._sinceLastDown < 100) {
 
             this._fire(EventType.click, event);
 
