@@ -1,88 +1,49 @@
-import * as PIXI from "pixi.js";
-import * as TYPES from "../definitions";
+import Konva from "konva";
 import { assertUnreachable } from "../utils/general";
 
 export class Action {
-    private _actionType: TYPES.ActionType;
-    private _path: TYPES.Coords[]
-    private _origin: TYPES.Coords
+    private _actionType: ActionType;
+    private _path: number[]
+    private _origin: Coords
     private _width: number
     private _color: number
-    graphics?: PIXI.Graphics
+    private _object: Konva.Shape
 
-    get isActive() {
-        return !(this.graphics == null);
-    }
+    constructor(data: ActionData) {
+        let { width, color, origin, path, actionType } = data;
 
-    constructor({ width, color, origin, path, actionType }: TYPES.ActionData) {
         this._path = path;
         this._origin = origin;
         this._actionType = actionType;
         this._width = width;
         this._color = color;
+
+        this._object = this._create(data);
     }
 
-    mutate({ width, color, origin, path, actionType }: TYPES.OptionalActionData): PIXI.Graphics {
-        if (width != null)
-            this._width = width;
-        if (color != null)
-            this._color = color;
-        if (origin != null)
-            this._origin = origin;
-        if (path != null)
-            this._path = path;
-        if (actionType != null)
-            this._actionType = actionType;
-
-        this.graphics = this._toGraphics();
-
-        return this.graphics;
-    }
-
-    activate() {
-        this.graphics = this._toGraphics();
-    }
-
-    clone() {
-        return new Action({
-            width: this._width,
-            color: this._color,
-            origin: this._origin,
-            path: this._path,
-            actionType: this._actionType
-        });
-    }
-
-    private _toGraphics(): PIXI.Graphics {
-        switch(this._actionType) {
-            case TYPES.ActionType.Line:
-                return this._drawLine();
+    private _create({ width, color, origin, path, actionType }: ActionData): Konva.Shape {
+        switch(actionType) {
+            case "Line":
+                return new Konva.Line({
+                    points: [...origin, ...path],
+                    stroke: color.toString(16),
+                    strokeWidth: width,
+                    lineCap: 'round',
+                    lineJoin: 'round',
+                });
             default:
-                assertUnreachable(this._actionType);
+                assertUnreachable(actionType);
         }
+        
     }
 
-    private _drawLine() {
-        const graphics = new PIXI.Graphics();
-
-        graphics.moveTo(...this._origin);
-
-        for (let i = 0; i < this._path.length ; i++) {
-            graphics.lineTo(...this._path[i]);
-        }
-
-        graphics.stroke({ width: this._width, color: this._color });
-
-        return graphics;
-    }
-
-    get get_actionType(): TYPES.ActionType {
+    get get_actionType(): ActionType {
         return this._actionType;
     }
-    get path(): TYPES.Coords[] {
+    get path(): number[] {
         return this._path;
     }
-    get origin(): TYPES.Coords {
+    get origin(): Coords {
         return this._origin;
     }
     get width(): number {
@@ -90,5 +51,41 @@ export class Action {
     }
     get color(): number {
         return this._color;
+    }
+    get object(): Konva.Shape {
+        return this._object
+    }
+
+    set path(value: number[]) {
+        this._path = value;
+        switch(this._actionType) {
+            case "Line":
+                (this._object as Konva.Line).points([...this._origin, ...value]);
+                break;
+        }
+    }
+    set origin(value: Coords) {
+        this._origin = value;
+        switch(this._actionType) {
+            case "Line":
+                (this._object as Konva.Line).points([...value, ...this._path]);
+                break;
+        }
+    }
+    set width(value: number) {
+        this._width = value;
+        switch(this._actionType) {
+            case "Line":
+                (this._object as Konva.Line).width(value);
+                break;
+        }
+    }
+    set color(value: number) {
+        this._color = value;
+        switch(this._actionType) {
+            case "Line":
+                (this._object as Konva.Line).colorKey = value.toString(16);
+                break;
+        }
     }
 }

@@ -1,5 +1,3 @@
-import * as TYPES from "../definitions";
-
 export function sleep(time: number, callback?: () => undefined) {
     if (callback == null)
         return new Promise((resolve) => setTimeout(resolve, time))
@@ -12,7 +10,7 @@ export function assertUnreachable(x: never): never {
     throw new Error(`Unhandled actionType case: ${exhaustiveCheck}`);
 }
 
-function getLocalCords(this: HTMLElement, mouseCoords: MouseEvent): TYPES.Coords {
+function getLocalCords(this: HTMLElement, mouseCoords: MouseEvent): Coords {
     const rect = this.getBoundingClientRect();
 
     const x = mouseCoords.clientX - rect.left;
@@ -28,15 +26,19 @@ function isWithinRange(this: number, compareTo: number, range: number): boolean 
     return false;
 }
 
-declare global {
-    interface HTMLElement {
-        getLocalCords: (coords: MouseEvent) => TYPES.Coords;
+function toVector2d(this: number[]): {x: number, y: number}[] {
+    if (this.length % 2 != 0)
+        return [];
+
+    const array: {x: number, y: number}[] = [];
+
+    for (let i = 0; i < this.length; i++) {
+        array.push({x: this[i], y: this[i + 1]});
     }
 
-    interface Number {
-        isWithingRange: (compareTo: number, range: number) => boolean
-    }
+    return array;
 }
-  
+
 HTMLElement.prototype.getLocalCords = getLocalCords;
 Number.prototype.isWithingRange = isWithinRange
+Array.prototype.toVector2d = toVector2d;
