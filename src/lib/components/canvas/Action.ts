@@ -76,7 +76,7 @@ export class Action {
             height: Math.abs(action._height),
             width: Math.abs(action._width),
             strokeWidth: action._strokeWidth,
-            stroke: `#${action._fillColor.toString(16)}`,
+            stroke: `#${action._strokeColor.toString(16)}`,
             fill: action._getFillColor(),
             cornerRadius: action._cornerRadius
         });
@@ -102,7 +102,7 @@ export class Action {
             radiusY: Math.abs(action._height) / 2,
             radiusX: Math.abs(action._width) / 2,
             strokeWidth: action._strokeWidth,
-            stroke: `#${action._fillColor.toString(16)}`,
+            stroke: `#${action._strokeColor.toString(16)}`,
             fill: action._getFillColor(),
         });
 
