@@ -10,7 +10,7 @@ export class CanvasHandler implements IMouseEvents {
     private _isClick: boolean = false;
     private _originClickCoords?: Coords
 
-    currentMode: InteractionType = "DrawLine"
+    currentMode: InteractionType = "DrawSquare"
     fillColor: number = 0x00000000
     strokeColor: number = 0xFF5555
     strokeWidth: number = 2
@@ -100,7 +100,7 @@ export class CanvasHandler implements IMouseEvents {
         switch(event.code) {
             case "Escape":
                 this._isClick = false;
-                this._stopDrawing("Line")
+                this._stopDrawing("Line", { includeTempFinalPath: false })
                 return;
             case "KeyN":
                 if (event.shiftKey && event.ctrlKey) {
@@ -215,13 +215,13 @@ export class CanvasHandler implements IMouseEvents {
         }
     }
 
-    private _stopDrawing(type: ActionType) {
+    private _stopDrawing(type: ActionType, { includeTempFinalPath = true } = {}) {
         this._originClickCoords = undefined;
 
         switch(type) {
             case "Line":
                 if (!this._isClick) {
-                    this._actions.commitCurrentDrawing();
+                    this._actions.commitCurrentDrawing({ includeTempFinalPath });
                 }
                 return;
             case "Square":

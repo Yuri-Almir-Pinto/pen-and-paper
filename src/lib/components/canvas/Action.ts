@@ -16,21 +16,25 @@ export class Action {
 
     private _tempFinalPath?: Coords
 
-    commit() {
-        this._tempFinalPath = undefined;
+    commit({ includeTempFinalPath = false } = {}) {
         const actionType = this._actionType;
 
         switch(actionType) {
             case "Line":
-                (this._object as Konva.Line).points([...this._origin, ...this._path])
-                return;
+                if (includeTempFinalPath && this._tempFinalPath != undefined)
+                    (this._object as Konva.Line).points([...this._origin, ...this._path, ...this._tempFinalPath])
+                else
+                    (this._object as Konva.Line).points([...this._origin, ...this._path])
+                break;
             case "Square":
-                return;
+                break;
             case "Circle":
-                return;
+                break;
             default:
                 assertUnreachable(actionType);
         }
+
+        this._tempFinalPath = undefined;
     }
 
     static newLine({ strokeWidth, strokeColor, origin, path }: LineData): Action {
@@ -234,13 +238,13 @@ export class Action {
 
         switch(actionType) {
             case "Line":
-                (this._object as Konva.Line).colorKey = color;
+                (this._object as Konva.Line).stroke(color);
                 return;
             case "Square":
-                (this._object as Konva.Rect).colorKey = color;
+                (this._object as Konva.Rect).stroke(color);
                 return;
             case "Circle":
-                (this._object as Konva.Circle).colorKey = color;
+                (this._object as Konva.Circle).stroke(color);
                 return;
             default:
                 assertUnreachable(actionType);

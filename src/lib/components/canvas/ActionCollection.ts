@@ -27,15 +27,14 @@ export class ActionCollection {
         this.refresh();
     }
 
-    commitCurrentDrawing() {
-        this._currentlyDrawing?.commit();
-        this.addAction(this._currentlyDrawing)
+    commitCurrentDrawing({ includeTempFinalPath = false } = {}) {
+        this.addAction({ includeTempFinalPath }, this._currentlyDrawing)
         this._currentlyDrawing = undefined;
     }
 
     // Adiciona ação no layer, na lista, e desenha ela.
-    addAction(...actions: SparseArray<ACTION.Action>) {
-        actions.forEach((action) => action?.commit());
+    addAction({ includeTempFinalPath = false } = {}, ...actions: SparseArray<ACTION.Action>) {
+        actions.forEach((action) => action?.commit({ includeTempFinalPath }));
 
         this._actions.push(...actions);
 
