@@ -11,10 +11,6 @@ export class ActionCollection {
         this._layer = layer;
     }
 
-    discardCurrentFinalPath() {
-        this._currentlyDrawing?.emptyTempFinalPath();
-    }
-
     addCurrentDrawing(action: ACTION.Action) {
         this._currentlyDrawing = action;
         this.draw(action);

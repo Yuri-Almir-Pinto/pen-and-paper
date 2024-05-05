@@ -3,26 +3,34 @@ import Konva from "konva";
 
 
 declare global {
-    type ActionType = "Line"
+    type ActionType = "Line" | "Square"
     
-    type InteractionType = "DrawLine"
+    type InteractionType = "DrawLine" | "DrawSquare"
     
     type Coords = [number, number];
     
-    interface ActionData {
-        actionType: ActionType
+    interface LineData {
         path: number[]
         origin: Coords
-        width: number
-        color: number
+        strokeWidth: number
+        strokeColor: number
     }
-    
-    interface OptionalActionData {
-        actionType?: ActionType
-        path?: number[]
-        origin?: Coords
-        width?: number
-        color?: number
+
+    interface SquareData {
+        x: number
+        y: number
+        width: number
+        height: number
+        fillColor: number
+        strokeColor: number
+        strokeWidth: number
+        cornerRadius: number
+        transparent: boolean
+    }
+
+    interface Size {
+        width: number,
+        height: number,
     }
     
     type SparseArray<T> = (T | undefined)[];

@@ -8,10 +8,14 @@ export class CanvasHandler implements IMouseEvents {
     private _app: Konva.Stage
     private _actions: COLLECTION.ActionCollection
     private _isClick: boolean = false;
+    private _originClickCoords?: Coords
 
-    currentMode: InteractionType = "DrawLine"
-    currentColor: number = 0xFF5555
-    currentWidth: number = 4
+    currentMode: InteractionType = "DrawSquare"
+    fillColor: number = 0x00000000
+    strokeColor: number = 0xFF5555
+    strokeWidth: number = 4
+    roundedCorners: number = 10
+    transparent: boolean = false
 
     constructor(app: Konva.Stage) {
         this._app = app;
@@ -19,13 +23,16 @@ export class CanvasHandler implements IMouseEvents {
         this._app.add(layer);
         this._actions = new COLLECTION.ActionCollection(layer);
 
-        const eventsHandler = new CanvasEventsHandler(this, this._app);
+        new CanvasEventsHandler(this, this._app);
     }
 
     mouseDownHandler(event: Konva.KonvaEventObject<MouseEvent>) {
         switch(this.currentMode) {
             case "DrawLine":
                 this._startDrawing("Line", event)
+                return;
+            case "DrawSquare":
+                this._startDrawing("Square", event);
                 return;
             default:
                 assertUnreachable(this.currentMode);
@@ -36,6 +43,9 @@ export class CanvasHandler implements IMouseEvents {
         switch(this.currentMode) {
             case "DrawLine":
                 this._stopDrawing("Line")
+                return;
+            case "DrawSquare":
+                this._stopDrawing("Square");
                 return;
             default:
                 assertUnreachable(this.currentMode);
@@ -48,6 +58,8 @@ export class CanvasHandler implements IMouseEvents {
             case "DrawLine":
                 if (this._actions.isDrawing)
                     this._progressDrawing("Line", event, { isClick: true })
+                return;
+            case "DrawSquare":
                 return;
             default:
                 assertUnreachable(this.currentMode);
@@ -63,6 +75,10 @@ export class CanvasHandler implements IMouseEvents {
                 if (this._actions.isDrawing)
                     this._progressDrawing("Line", event)
                 return;
+            case "DrawSquare":
+                if (this._actions.isDrawing)
+                    this._progressDrawing("Square", event);
+                return;
             default:
                 assertUnreachable(this.currentMode);
         }
@@ -72,7 +88,6 @@ export class CanvasHandler implements IMouseEvents {
         switch(event.code) {
             case "Escape":
                 this._isClick = false;
-                this._actions.discardCurrentFinalPath();
                 this._stopDrawing("Line")
                 return;
             case "KeyN":
@@ -89,18 +104,34 @@ export class CanvasHandler implements IMouseEvents {
         if (this._actions.isDrawing)
             return;
 
+        const { evt: { layerX: x, layerY: y } } = event;
+        this._originClickCoords = [x, y];
+
         switch(type) {
             case "Line":
-                const { evt: { layerX: x, layerY: y } } = event;
-                const action = new ACTION.Action({
-                    actionType: type,
-                    color: this.currentColor,
+                const line = ACTION.Action.newLine({
+                    strokeColor: this.strokeColor,
                     origin: [x, y],
                     path: [x, y],
-                    width: this.currentWidth
+                    strokeWidth: this.strokeWidth
                 });
 
-                this._actions.addCurrentDrawing(action);
+                this._actions.addCurrentDrawing(line);
+                return;
+            case "Square":
+                const square = ACTION.Action.newSquare({
+                    x: x,
+                    y: y,
+                    width: x - this._originClickCoords[0],
+                    height: y - this._originClickCoords[1],
+                    fillColor: this.fillColor,
+                    strokeColor: this.strokeColor,
+                    strokeWidth: this.strokeWidth,
+                    cornerRadius: this.roundedCorners,
+                    transparent: this.transparent
+                });
+
+                this._actions.addCurrentDrawing(square);
                 return;
             default:
                 assertUnreachable(type);
@@ -108,10 +139,10 @@ export class CanvasHandler implements IMouseEvents {
     }
 
     private _progressDrawing(type: ActionType, event: Konva.KonvaEventObject<MouseEvent>, { isClick = false } = {}) {
+        const { evt: { layerX: x, layerY: y } } = event;
+
         switch(type) {
             case "Line":
-                const { evt: { layerX: x, layerY: y } } = event;
-
                 if (isClick) {
                     this._actions.progressCurrentDrawing((action) => {
                         action.path = [...action.path, x, y];
@@ -120,7 +151,23 @@ export class CanvasHandler implements IMouseEvents {
 
                 this._actions.progressCurrentDrawing((action) => {
                     action.tempFinalPath = [x, y]
-                })
+                });
+
+                return;
+
+            case "Square":
+                if (this._originClickCoords == undefined) {
+                    console.error("originClickCoords undefined when they shouldn't (Drawing square)");
+                    return;
+                }
+
+                this._actions.progressCurrentDrawing((action) => {
+                    action.size({ 
+                        width: x - this._originClickCoords![0],
+                        height: y - this._originClickCoords![1]
+                    });
+                });
+
                 return;
             default:
                 assertUnreachable(type);
@@ -128,13 +175,16 @@ export class CanvasHandler implements IMouseEvents {
     }
 
     private _stopDrawing(type: ActionType) {
+        this._originClickCoords = undefined;
+
         switch(type) {
             case "Line":
                 if (!this._isClick) {
                     this._actions.commitCurrentDrawing();
                 }
-
-                console.log(this._actions);
+                return;
+            case "Square":
+                this._actions.commitCurrentDrawing();
                 return;
             default:
                 assertUnreachable(type);
