@@ -1,7 +1,12 @@
-# Tauri + Svelte + Typescript
+# Todo list
 
-This template should help get you started developing with Tauri, Svelte and TypeScript in Vite.
-
-## Recommended IDE Setup
-
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
+### Canvas -
+- Desenho de círculo
+- Desenho de quadrado
+- Desenho de (Ou triângulo ou losângulo)
+- Função de undo (Ctrl + Z)
+- Ferramentas de mudança de parâmetros
+- Função de seleção com arraste do mouse
+- Função de mover canvas
+- Função de zoom canvas
+- Função de edição de formas
