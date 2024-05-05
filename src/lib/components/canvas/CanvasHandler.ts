@@ -10,7 +10,7 @@ export class CanvasHandler implements IMouseEvents {
     private _isClick: boolean = false;
     private _originClickCoords?: Coords
 
-    currentMode: InteractionType = "DrawCircle"
+    currentMode: InteractionType = "DrawSquare"
     fillColor: number = 0x00000000
     strokeColor: number = 0xFF5555
     strokeWidth: number = 2

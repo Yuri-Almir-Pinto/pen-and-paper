@@ -54,6 +54,9 @@ export class Action {
             lineJoin: 'round',
         });
 
+        action._object.shadowForStrokeEnabled(false);
+        action._object.perfectDrawEnabled(false);
+
         return action;
     }
 
@@ -81,6 +84,9 @@ export class Action {
             cornerRadius: action._cornerRadius
         });
 
+        action._object.shadowForStrokeEnabled(false);
+        action._object.perfectDrawEnabled(false);
+
         return action;
     }
 
@@ -105,6 +111,9 @@ export class Action {
             stroke: `#${action._strokeColor.toString(16)}`,
             fill: action._getFillColor(),
         });
+
+        action._object.shadowForStrokeEnabled(false);
+        action._object.perfectDrawEnabled(false);
 
         return action;
     }
