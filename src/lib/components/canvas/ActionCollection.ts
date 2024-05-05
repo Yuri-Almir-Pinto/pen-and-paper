@@ -23,8 +23,7 @@ export class ActionCollection {
         }
             
         progressFunc(this._currentlyDrawing);
-
-        this.refresh();
+        // this.refresh();
     }
 
     commitCurrentDrawing({ includeTempFinalPath = false } = {}) {
@@ -35,9 +34,9 @@ export class ActionCollection {
     // Adiciona ação no layer, na lista, e desenha ela.
     addAction({ includeTempFinalPath = false } = {}, ...actions: SparseArray<ACTION.Action>) {
         actions.forEach((action) => action?.commit({ includeTempFinalPath }));
-
+        
         this._actions.push(...actions);
-
+        
         this.draw(...actions);
     }
 
@@ -54,9 +53,10 @@ export class ActionCollection {
 
     // Desenha a ação no layer.
     draw(...actions: SparseArray<ACTION.Action>) {
-        if (actions.length === 1)
+        if (actions.length === 1) {
             if (actions[0] != undefined)
                 this._layer.add(actions[0].object);
+        }
         else {
             const objects: Konva.Shape[] = [];
             for (let i = 0; i < actions.length; i++) {
@@ -68,7 +68,6 @@ export class ActionCollection {
             this._layer.add(...objects);
         }
 
-        this.refresh();
     }
 
     refresh() {

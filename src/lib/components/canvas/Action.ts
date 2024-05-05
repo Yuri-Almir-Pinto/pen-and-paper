@@ -160,11 +160,11 @@ export class Action {
         switch(actionType) {
             case "Line":
                 (this._object as Konva.Line).points([...this._origin, ...value]);
-                return;
+                break;
             case "Square":
-                return;
+                break;
             case "Circle":
-                return;
+                break;
             default:
                 assertUnreachable(actionType);
         }
@@ -176,19 +176,19 @@ export class Action {
         switch(actionType) {
             case "Line":
                 (this._object as Konva.Line).points([...this._origin, ...this._path]);
-                return;
+                break;
             case "Square":
                 (this._object as Konva.Rect).position({
                     x: this._origin[0],
                     y: this._origin[1]
                 });
-                return;
+                break;
             case "Circle":
                 (this._object as Konva.Circle).position({
                     x: this._origin[0],
                     y: this._origin[1]
                 });
-                return;
+                break;
             default:
                 assertUnreachable(actionType);
         }
@@ -200,7 +200,7 @@ export class Action {
 
         switch(actionType) {
             case "Line":
-                return;
+                break;
             case "Square":
                 (this._object as Konva.Rect).width(Math.abs(this._width));
                 (this._object as Konva.Rect).height(Math.abs(this._height));
@@ -208,16 +208,15 @@ export class Action {
                     x: this._width > 0 ? this._origin[0] : this.xMousePos,
                     y: this._height > 0 ? this._origin[1] : this.yMousePos
                 });
-                return;
+                break;
             case "Circle":
                 (this._object as Konva.Ellipse).radiusX(Math.abs(this._width) / 2);
                 (this._object as Konva.Ellipse).radiusY(Math.abs(this._height) / 2);
-
                 (this._object as Konva.Rect).position({
                     x: this._width > 0 ? this._origin[0] + this._width / 2 : this.xMousePos - this._width / 2,
                     y: this._height > 0 ? this._origin[1] + this._height / 2 : this.yMousePos - this._height / 2
                 });
-                return;
+                break;
             default:
                 assertUnreachable(actionType);
         }
@@ -229,13 +228,13 @@ export class Action {
         switch(actionType) {
             case "Line":
                 (this._object as Konva.Line).width(this._strokeWidth);
-                return;
+                break;
             case "Square":
                 (this._object as Konva.Rect).strokeWidth(this._strokeWidth);
-                return;
+                break;
             case "Circle":
                 (this._object as Konva.Circle).strokeWidth(this._strokeWidth);
-                return;
+                break;
             default:
                 assertUnreachable(actionType);
         }
@@ -248,13 +247,13 @@ export class Action {
         switch(actionType) {
             case "Line":
                 (this._object as Konva.Line).stroke(color);
-                return;
+                break;
             case "Square":
                 (this._object as Konva.Rect).stroke(color);
-                return;
+                break;
             case "Circle":
                 (this._object as Konva.Circle).stroke(color);
-                return;
+                break;
             default:
                 assertUnreachable(actionType);
         }
@@ -265,12 +264,12 @@ export class Action {
 
         switch(actionType) {
             case "Line":
-                return;
+                break;
             case "Square":
                 (this._object as Konva.Rect).cornerRadius(this._cornerRadius);
-                return;
+                break;
             case "Circle":
-                return;
+                break;
             default:
                 assertUnreachable(actionType);
         }
@@ -282,13 +281,13 @@ export class Action {
 
         switch(actionType) {
             case "Line":
-                return;
+                break;
             case "Square":
                 (this._object as Konva.Rect).fill(color);
-                return;
+                break;
             case "Circle":
                 (this._object as Konva.Circle).fill(color);
-                return;
+                break;
             default:
                 assertUnreachable(actionType);
         }
@@ -300,11 +299,11 @@ export class Action {
         switch(actionType) {
             case "Line":
                 (this._object as Konva.Line).points([...this._origin, ...this._path, ...this._tempFinalPath])
-                return;
+                break;
             case "Square":
-                return;
+                break;
             case "Circle":
-                return;
+                break;
             default:
                 assertUnreachable(actionType);
         }

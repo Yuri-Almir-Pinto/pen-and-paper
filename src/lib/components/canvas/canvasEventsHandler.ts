@@ -78,6 +78,7 @@ export class CanvasEventsHandler {
 
     private _handleMouseMove(event: Konva.KonvaEventObject<MouseEvent>) {
         this._fire(EventType.move, event);
+
     }
 
     private _handleKeyDown(event: KeyboardEvent) {

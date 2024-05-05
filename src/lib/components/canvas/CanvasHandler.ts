@@ -30,13 +30,13 @@ export class CanvasHandler implements IMouseEvents {
         switch(this.currentMode) {
             case "DrawLine":
                 this._startDrawing("Line", event)
-                return;
+                break;
             case "DrawSquare":
                 this._startDrawing("Square", event);
-                return;
+                break;
             case "DrawCircle":
                 this._startDrawing("Circle", event);
-                return;
+                break;
             default:
                 assertUnreachable(this.currentMode);
         }
@@ -46,13 +46,13 @@ export class CanvasHandler implements IMouseEvents {
         switch(this.currentMode) {
             case "DrawLine":
                 this._stopDrawing("Line")
-                return;
+                break;
             case "DrawSquare":
                 this._stopDrawing("Square");
-                return;
+                break;
             case "DrawCircle":
-                    this._stopDrawing("Circle");
-                    return;
+                this._stopDrawing("Circle");
+                break;
             default:
                 assertUnreachable(this.currentMode);
         }
@@ -64,11 +64,11 @@ export class CanvasHandler implements IMouseEvents {
             case "DrawLine":
                 if (this._actions.isDrawing)
                     this._progressDrawing("Line", event, { isClick: true })
-                return;
+                break;
             case "DrawSquare":
-                return;
+                break;
             case "DrawCircle":
-                return;
+                break;
             default:
                 assertUnreachable(this.currentMode);
         }
@@ -82,15 +82,15 @@ export class CanvasHandler implements IMouseEvents {
             case "DrawLine":
                 if (this._actions.isDrawing)
                     this._progressDrawing("Line", event)
-                return;
+                break;
             case "DrawSquare":
                 if (this._actions.isDrawing)
                     this._progressDrawing("Square", event);
-                return;
+                break;
             case "DrawCircle":
                 if (this._actions.isDrawing)
                     this._progressDrawing("Circle", event);
-                return;
+                break;
             default:
                 assertUnreachable(this.currentMode);
         }
@@ -101,14 +101,14 @@ export class CanvasHandler implements IMouseEvents {
             case "Escape":
                 this._isClick = false;
                 this._stopDrawing("Line", { includeTempFinalPath: false })
-                return;
+                break;
             case "KeyN":
                 if (event.shiftKey && event.ctrlKey) {
                     this._isClick = false;
                     this._actions.commitCurrentDrawing();
                     this._actions.clear();
                 }
-                return;
+                break;
         }
     }
 
@@ -129,7 +129,7 @@ export class CanvasHandler implements IMouseEvents {
                 });
 
                 this._actions.addCurrentDrawing(line);
-                return;
+                break;
             case "Square":
                 const square = ACTION.Action.newSquare({
                     x: x,
@@ -144,7 +144,7 @@ export class CanvasHandler implements IMouseEvents {
                 });
 
                 this._actions.addCurrentDrawing(square);
-                return;
+                break;
             case "Circle":
                     const circle = ACTION.Action.newCircle({
                         x: x,
@@ -157,8 +157,8 @@ export class CanvasHandler implements IMouseEvents {
                         transparent: this.transparent
                     });
     
-                    this._actions.addCurrentDrawing(circle);
-                    return;
+                this._actions.addCurrentDrawing(circle);
+                break;
             default:
                 assertUnreachable(type);
         }
@@ -179,8 +179,7 @@ export class CanvasHandler implements IMouseEvents {
                     action.tempFinalPath = [x, y]
                 });
 
-                return;
-
+                break;
             case "Square":
                 if (this._originClickCoords == undefined) {
                     console.error("originClickCoords undefined when they shouldn't (Drawing square)");
@@ -194,8 +193,7 @@ export class CanvasHandler implements IMouseEvents {
                     });
                 });
 
-                return;
-
+                break;
             case "Circle":
                 if (this._originClickCoords == undefined) {
                     console.error("originClickCoords undefined when they shouldn't (Drawing circle)");
@@ -208,8 +206,7 @@ export class CanvasHandler implements IMouseEvents {
                         height: y - this._originClickCoords![1]
                     });
                 });
-
-                return;
+                break;
             default:
                 assertUnreachable(type);
         }
@@ -223,13 +220,13 @@ export class CanvasHandler implements IMouseEvents {
                 if (!this._isClick) {
                     this._actions.commitCurrentDrawing({ includeTempFinalPath });
                 }
-                return;
+                break;
             case "Square":
                 this._actions.commitCurrentDrawing();
-                return;
+                break;
             case "Circle":
                 this._actions.commitCurrentDrawing();
-                return;
+                break;
             default:
                 assertUnreachable(type);
         }
