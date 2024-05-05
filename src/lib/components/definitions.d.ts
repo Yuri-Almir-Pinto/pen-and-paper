@@ -3,9 +3,9 @@ import Konva from "konva";
 
 
 declare global {
-    type ActionType = "Line" | "Square"
+    type ActionType = "Line" | "Square" | "Circle"
     
-    type InteractionType = "DrawLine" | "DrawSquare"
+    type InteractionType = "DrawLine" | "DrawSquare" | "DrawCircle"
     
     type Coords = [number, number];
     
@@ -25,6 +25,17 @@ declare global {
         strokeColor: number
         strokeWidth: number
         cornerRadius: number
+        transparent: boolean
+    }
+
+    interface CircleData {
+        x: number
+        y: number
+        width: number
+        height: number
+        fillColor: number
+        strokeColor: number
+        strokeWidth: number
         transparent: boolean
     }
 
