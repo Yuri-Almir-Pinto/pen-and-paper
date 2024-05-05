@@ -11,6 +11,10 @@ export class ActionCollection {
         this._layer = layer;
     }
 
+    discardCurrentFinalPath() {
+        this._currentlyDrawing?.emptyTempFinalPath();
+    }
+
     addCurrentDrawing(action: ACTION.Action) {
         this._currentlyDrawing = action;
         this.draw(action);
@@ -36,7 +40,7 @@ export class ActionCollection {
     // Adiciona ação no layer, na lista, e desenha ela.
     addAction(...actions: SparseArray<ACTION.Action>) {
         actions.forEach((action) => action?.commit());
-        
+
         this._actions.push(...actions);
 
         this.draw(...actions);

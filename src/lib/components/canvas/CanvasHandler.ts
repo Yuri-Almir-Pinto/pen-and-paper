@@ -10,7 +10,7 @@ export class CanvasHandler implements IMouseEvents {
     private _isClick: boolean = false;
 
     currentMode: InteractionType = "DrawLine"
-    currentColor: number = 0xFF0000
+    currentColor: number = 0xFF5555
     currentWidth: number = 4
 
     constructor(app: Konva.Stage) {
@@ -72,6 +72,7 @@ export class CanvasHandler implements IMouseEvents {
         switch(event.code) {
             case "Escape":
                 this._isClick = false;
+                this._actions.discardCurrentFinalPath();
                 this._stopDrawing("Line")
                 return;
             case "KeyN":

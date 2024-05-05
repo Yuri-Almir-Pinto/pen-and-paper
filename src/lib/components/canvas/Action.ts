@@ -27,12 +27,20 @@ export class Action {
             this._path = [...this._path, ...this._tempFinalPath];
     }
 
+    emptyTempFinalPath() {
+        this._tempFinalPath = undefined;
+        switch(this._actionType) {
+            case "Line":
+                (this._object as Konva.Line).points([...this._origin, ...this._path])
+        }
+    }
+
     private _create({ width, color, origin, path, actionType }: ActionData): Konva.Shape {
         switch(actionType) {
             case "Line":
                 return new Konva.Line({
                     points: [...origin, ...path],
-                    stroke: color.toString(16),
+                    stroke: `#${color.toString(16)}`,
                     strokeWidth: width,
                     lineCap: 'round',
                     lineJoin: 'round',
