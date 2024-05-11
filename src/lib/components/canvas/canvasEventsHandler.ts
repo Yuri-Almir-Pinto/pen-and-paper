@@ -21,7 +21,7 @@ export class CanvasEventsHandler {
     private _sinceLastClick: number = Date.now()
     static acceptableRange: number = 25
 
-    constructor(handler: IMouseEvents, app: Konva.Stage) {
+    constructor(handler: IMouseEvents, app: SVGElement) {
         this._handler = handler;
         this._mouseDownHandler = handler.mouseDownHandler;
         this._mouseUpHandler = handler.mouseUpHandler;
@@ -30,39 +30,35 @@ export class CanvasEventsHandler {
         this._mouseMoveHandler = handler.mouseMoveHandler;
         this._keydownHandler = handler.keydownHandler;
 
-        app.on("pointerdown", (event: Konva.KonvaEventObject<MouseEvent>) => this._handleMouseDown(event));
-        app.on("pointerup", (event: Konva.KonvaEventObject<MouseEvent>) => this._handleMouseUp(event));
-        app.on("pointermove", (event: Konva.KonvaEventObject<MouseEvent>) => this._handleMouseMove(event));
+        app.addEventListener("mousedown", (event: MouseEvent) => this._handleMouseDown(event));
+        app.addEventListener("mouseup", (event: MouseEvent) => this._handleMouseUp(event));
+        app.addEventListener("mousemove", (event: MouseEvent) => this._handleMouseMove(event));
+        app.addEventListener("keydown", (event: KeyboardEvent) => this._handleKeyDown(event));
 
-        const container = app.container();
-        container.tabIndex = 1;
-        container.focus();
-        container.addEventListener("keydown", (event: KeyboardEvent) => this._handleKeyDown(event));
+        app.tabIndex = 0;
     }
 
-    private _fire(type: EventType, event: Konva.KonvaEventObject<MouseEvent>
-                                        | KeyboardEvent
-    ) {
+    private _fire(type: EventType, event: MouseEvent | KeyboardEvent) {
         switch(type) {
-            case EventType.click: this._mouseClickHandler.call(this._handler, event as Konva.KonvaEventObject<MouseEvent>); return;
-            case EventType.doubleClick: this._mouseDoubleClickHandler.call(this._handler, event as Konva.KonvaEventObject<MouseEvent>); return;
-            case EventType.up: this._mouseUpHandler.call(this._handler, event as Konva.KonvaEventObject<MouseEvent>); return;
-            case EventType.down: this._mouseDownHandler.call(this._handler, event as Konva.KonvaEventObject<MouseEvent>); return;
-            case EventType.move: this._mouseMoveHandler.call(this._handler, event as Konva.KonvaEventObject<MouseEvent>); return;
+            case EventType.click: this._mouseClickHandler.call(this._handler, event as MouseEvent); return;
+            case EventType.doubleClick: this._mouseDoubleClickHandler.call(this._handler, event as MouseEvent); return;
+            case EventType.up: this._mouseUpHandler.call(this._handler, event as MouseEvent); return;
+            case EventType.down: this._mouseDownHandler.call(this._handler, event as MouseEvent); return;
+            case EventType.move: this._mouseMoveHandler.call(this._handler, event as MouseEvent); return;
             case EventType.keydown: this._keydownHandler.call(this._handler, event as KeyboardEvent); return;
             default: assertUnreachable(type);
         }
     }
 
-    private _handleMouseDown(event: Konva.KonvaEventObject<MouseEvent>) {
+    private _handleMouseDown(event: MouseEvent) {
         this._sinceLastDown = Date.now();
-        const { evt: { layerX: x, layerY: y }} = event;
+        const { layerX: x, layerY: y } = event;
         this._downMousePostion = [x, y];
         this._fire(EventType.down, event);
     }
 
-    private _handleMouseUp(event: Konva.KonvaEventObject<MouseEvent>) {
-        const { evt: { layerX: x, layerY: y }} = event;
+    private _handleMouseUp(event: MouseEvent) {
+        const { layerX: x, layerY: y } = event;
         if (Date.now() - this._sinceLastDown < 100) {
 
             this._fire(EventType.click, event);
@@ -76,7 +72,7 @@ export class CanvasEventsHandler {
         this._fire(EventType.up, event);
     }
 
-    private _handleMouseMove(event: Konva.KonvaEventObject<MouseEvent>) {
+    private _handleMouseMove(event: MouseEvent) {
         this._fire(EventType.move, event);
 
     }

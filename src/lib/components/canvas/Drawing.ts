@@ -2,19 +2,24 @@ import Konva from "konva";
 import { assertUnreachable } from "../utils/general";
 
 export class Drawing {
-    private _actionType: ActionType = "Line";
+    static ns: "http://www.w3.org/2000/svg" = "http://www.w3.org/2000/svg"
+
+    private _actionType: ActionType = "Line"
     private _path: number[] = []
     private _origin: Coords = [0, 0]
     private _height: number = 0
     private _width: number = 0
     private _strokeWidth: number = 0
-    private _strokeColor: number = 0
-    private _fillColor: number = 0
+    private _strokeColor: string = ""
+    private _fillColor: string = ""
     private _cornerRadius: number = 0
-    private _object: Konva.Shape = new Konva.Line()
-    private _transparentFill: boolean = false
+    private _object: SVGElement
     private _undoStack: UndoStack = new Map()
     private _tempFinalPath?: Coords
+
+    constructor(SVG: SVGElement) {
+        this._object = SVG;
+    }
 
     commit({ includeTempFinalPath = false } = {}): UndoStack {
         const actionType = this._actionType;
@@ -22,9 +27,9 @@ export class Drawing {
         switch(actionType) {
             case "Line":
                 if (includeTempFinalPath && this._tempFinalPath != undefined)
-                    (this._object as Konva.Line).points([...this._origin, ...this._path, ...this._tempFinalPath])
+                    this._object.setAttribute("d", `${this._toSVGPath("M", this._origin)}${this._toSVGPath("L", this._path)}${this._toSVGPath("L", this._tempFinalPath)}`);
                 else
-                    (this._object as Konva.Line).points([...this._origin, ...this._path])
+                    this._object.setAttribute("d", `${this._toSVGPath("M", this._origin)}${this._toSVGPath("L", this._path)}`);
                 break;
             case "Square":
                 break;
@@ -39,128 +44,135 @@ export class Drawing {
     }
 
     static newLine({ strokeWidth, strokeColor, origin, path }: LineData): Drawing {
-        const action = new Drawing();
+        const action = new Drawing(document.createElementNS(Drawing.ns, "path"));
 
         action._actionType = "Line";
         action._path = path;
         action._origin = origin;
         action._strokeWidth = strokeWidth;
-        action._strokeColor = strokeColor;
+        action._strokeColor = typeof strokeColor === "number" ? `#${strokeColor.toString(16)}` : strokeColor;
 
-        action._object = new Konva.Line({
-            points: [...origin, ...path],
-            stroke: `#${strokeColor.toString(16)}`,
-            strokeWidth: strokeWidth,
-            lineCap: 'round',
-            lineJoin: 'round',
-        });
+        const drawing = action._object;
+        drawing.setAttribute("stroke", action._strokeColor);
+        drawing.setAttribute("stroke-width", action._strokeWidth.toString());
+        drawing.setAttribute("fill", "none");
+        drawing.setAttribute("d", `M${action._origin[0]} ${action._origin[1]} ${action._toSVGPath("L", action._path)}`)
+        drawing.PenAndPaper = action;
 
-        action._object.shadowForStrokeEnabled(false);
-        action._object.perfectDrawEnabled(false);
+        action._object = drawing;
 
         return action;
     }
 
-    static newSquare({ x, y, width, height, fillColor, strokeColor, strokeWidth, cornerRadius, transparent }: SquareData): Drawing {
-        const action = new Drawing();
+    static newSquare({ origin, width, height, fillColor, strokeColor, strokeWidth, cornerRadius }: SquareData): Drawing {
+        const action = new Drawing(document.createElementNS(Drawing.ns, "rect"));
 
         action._actionType = "Square";
-        action._origin = [x, y];
+        action._origin = origin;
         action._width = width;
         action._height = height;
         action._strokeWidth = strokeWidth;
-        action._strokeColor = strokeColor;
-        action._fillColor = fillColor;
+        action._strokeColor = typeof strokeColor === "number" ? `#${strokeColor.toString(16)}` : strokeColor;
+        action._fillColor = typeof fillColor === "number" ? `#${fillColor.toString(16)}` : fillColor;
         action._cornerRadius = cornerRadius;
-        action._transparentFill = transparent;
 
-        action._object = new Konva.Rect({
-            x: action._origin[0],
-            y: action._origin[1],
-            height: Math.abs(action._height),
-            width: Math.abs(action._width),
-            strokeWidth: action._strokeWidth,
-            stroke: `#${action._strokeColor.toString(16)}`,
-            fill: action._getFillColor(),
-            cornerRadius: action._cornerRadius
-        });
+        const drawing = action._object;
+        drawing.setAttribute("stroke", action._strokeColor);
+        drawing.setAttribute("stroke-width", action._strokeWidth.toString());
+        drawing.setAttribute("fill", action._fillColor);
+        drawing.setAttribute("x", action._origin[0].toString());
+        drawing.setAttribute("y", action._origin[1].toString());
+        drawing.setAttribute("rx", action._cornerRadius.toString());
+        drawing.setAttribute("ry", action._cornerRadius.toString());
+        drawing.setAttribute("width", Math.abs(action._width).toString());
+        drawing.setAttribute("height", Math.abs(action._height).toString());
+        drawing.PenAndPaper = action;
 
-        action._object.shadowForStrokeEnabled(false);
-        action._object.perfectDrawEnabled(false);
+        action._object = drawing;
 
         return action;
     }
 
-    static newCircle({ x, y, width, height, fillColor, strokeColor, strokeWidth, transparent }: CircleData): Drawing {
-        const action = new Drawing();
+    static newCircle({ origin, width, height, fillColor, strokeColor, strokeWidth }: CircleData): Drawing {
+        const action = new Drawing(document.createElementNS(Drawing.ns, "ellipse"));
 
         action._actionType = "Circle";
-        action._origin = [x, y];
+        action._origin = origin;
         action._width = width;
         action._height = height;
         action._strokeWidth = strokeWidth;
-        action._strokeColor = strokeColor;
-        action._fillColor = fillColor;
-        action._transparentFill = transparent;
+        action._strokeColor = typeof strokeColor === "number" ? `#${strokeColor.toString(16)}` : strokeColor;
+        action._fillColor = typeof fillColor === "number" ? `#${fillColor.toString(16)}` : fillColor;
 
-        action._object = new Konva.Ellipse({
-            x: action._origin[0] + Math.abs(action._height / 2),
-            y: action._origin[1] + Math.abs(action._width / 2),
-            radiusY: Math.abs(action._height) / 2,
-            radiusX: Math.abs(action._width) / 2,
-            strokeWidth: action._strokeWidth,
-            stroke: `#${action._strokeColor.toString(16)}`,
-            fill: action._getFillColor(),
-        });
+        const drawing = action._object;
+        drawing.setAttribute("stroke", action._strokeColor);
+        drawing.setAttribute("stroke-width", action._strokeWidth.toString());
+        drawing.setAttribute("fill", action._fillColor);
+        drawing.setAttribute("cx", action._origin[0].toString());
+        drawing.setAttribute("cy", action._origin[1].toString());
+        drawing.setAttribute("rx", Math.abs(action._width / 2).toString());
+        drawing.setAttribute("ry", Math.abs(action._height / 2).toString());
+        drawing.PenAndPaper = action;
 
-        action._object.shadowForStrokeEnabled(false);
-        action._object.perfectDrawEnabled(false);
+        action._object = drawing;
 
         return action;
     }
 
-    private _getFillColor() {
-        return this._transparentFill ? `#${this._fillColor.toString(16)}` : "transparent";
+    private _toSVGPath(action: string, path: number[]): string {
+        if (path.length % 2 !== 0)
+            return "";
+
+        let returnString = "";
+
+        for (let i = 0; i < path.length; i++) {
+            if (i % 2 === 0)
+                returnString += `${action}${path[i]} `
+            else
+                returnString += `${path[i]} `
+        }
+
+        return returnString;
     }
 
-    get get_actionType(): ActionType {
+    getActionType(): ActionType {
         return this._actionType;
     }
-    get path(): number[] {
+    getPath(): number[] {
         return this._path;
     }
-    get origin(): number[] {
+    getOrigin(): number[] {
         return this._origin;
     }
-    get height(): number {
+    getHeight(): number {
         return this._height;
     }
-    get width(): number {
+    getWidth(): number {
         return this._width;
     }
-    get strokeWidth(): number {
+    getStrokeWidth(): number {
         return this._strokeWidth;
     }
-    get strokeColor(): number {
+    getStrokeColor(): string {
         return this._strokeColor;
     }
-    get cornerRadius(): number {
+    getCornerRadius(): number {
         return this._cornerRadius;
     }
-    get fillColor(): string {
-        return this._getFillColor();
+    getFillColor(): string {
+        return this._fillColor;
     }
-    get object(): Konva.Shape {
+    getObject(): SVGElement {
         return this._object
     }
 
-    set path(value: number[]) {
+    setPath(value: number[]) {
         const actionType = this._actionType;
         this._path = [...value];
 
         switch(actionType) {
             case "Line":
-                (this._object as Konva.Line).points([...this._origin, ...value]);
+                this._object.setAttribute("d", `${this._toSVGPath("M", this._origin)}${this._toSVGPath("L", this._path)}`);
                 break;
             case "Square":
                 break;
@@ -170,31 +182,27 @@ export class Drawing {
                 assertUnreachable(actionType);
         }
     }
-    set origin(value: Coords) {
+    setOrigin(value: Coords) {
         const actionType = this._actionType;
         this._origin = value;
 
         switch(actionType) {
             case "Line":
-                (this._object as Konva.Line).points([...this._origin, ...this._path]);
+                this._object.setAttribute("d", `${this._toSVGPath("M", this._origin)}${this._toSVGPath("L", this._path)}`);
                 break;
             case "Square":
-                (this._object as Konva.Rect).position({
-                    x: this._origin[0],
-                    y: this._origin[1]
-                });
+                this._object.setAttribute("x", this._origin[0].toString());
+                this._object.setAttribute("y", this._origin[1].toString());
                 break;
             case "Circle":
-                (this._object as Konva.Circle).position({
-                    x: this._origin[0],
-                    y: this._origin[1]
-                });
+                this._object.setAttribute("cx", this._origin[0].toString());
+                this._object.setAttribute("cy", this._origin[1].toString());
                 break;
             default:
                 assertUnreachable(actionType);
         }
     }
-    size({width, height}: Size) {
+    setSize({width, height}: Size) {
         const actionType = this._actionType;
         this._width = width;
         this._height = height;
@@ -203,63 +211,56 @@ export class Drawing {
             case "Line":
                 break;
             case "Square":
-                (this._object as Konva.Rect).width(Math.abs(this._width));
-                (this._object as Konva.Rect).height(Math.abs(this._height));
-                (this._object as Konva.Rect).position({
-                    x: this._width > 0 ? this._origin[0] : this.xMousePos,
-                    y: this._height > 0 ? this._origin[1] : this.yMousePos
-                });
+                this._object.setAttribute("width", Math.abs(this._width === 0 ? 1 : this._width).toString());
+                this._object.setAttribute("height", Math.abs(this._height === 0 ? 1 : this._height).toString());
+                let x = this._width > 0 ? this._origin[0] : this.getXMousePos();
+                let y = this._height > 0 ? this._origin[1] : this.getYMousePos();
+                
+                this._object.setAttribute("x", x.toString());
+                this._object.setAttribute("y", y.toString());
                 break;
             case "Circle":
-                (this._object as Konva.Ellipse).radiusX(Math.abs(this._width) / 2);
-                (this._object as Konva.Ellipse).radiusY(Math.abs(this._height) / 2);
-                (this._object as Konva.Rect).position({
-                    x: this._width > 0 ? this._origin[0] + this._width / 2 : this.xMousePos - this._width / 2,
-                    y: this._height > 0 ? this._origin[1] + this._height / 2 : this.yMousePos - this._height / 2
-                });
+                this._object.setAttribute("rx", Math.abs(this._width/2 === 0 ? 1 : this._width/2).toString());
+                this._object.setAttribute("ry", Math.abs(this._height/2 === 0 ? 1 : this._height/2).toString());
+                const xPos = this._width > 0 ? this._origin[0] + this._width / 2 : this.getXMousePos() - this._width / 2;
+                const yPos = this._height > 0 ? this._origin[1] + this._height / 2 : this.getYMousePos() - this._height / 2;
+                
+                this._object.setAttribute("cx", xPos.toString());
+                this._object.setAttribute("cy", yPos.toString());
                 break;
             default:
                 assertUnreachable(actionType);
         }
     }
-    set strokeWidth(value: number) {
+    setStrokeWidth(value: number) {
         const actionType = this._actionType;
         this._strokeWidth = value;
 
         switch(actionType) {
             case "Line":
-                (this._object as Konva.Line).width(this._strokeWidth);
-                break;
             case "Square":
-                (this._object as Konva.Rect).strokeWidth(this._strokeWidth);
-                break;
             case "Circle":
-                (this._object as Konva.Circle).strokeWidth(this._strokeWidth);
+                this._object.setAttribute("stroke-width", this._strokeWidth.toString());
                 break;
             default:
                 assertUnreachable(actionType);
         }
     }
-    set strokeColor(value: number) {
+    setStrokeColor(value: number | string) {
         const actionType = this._actionType;
-        this._strokeColor = value;
-        const color = `#${this._strokeColor.toString(16)}`;
+        this._strokeColor = typeof value === "number" ? `#${value.toString(16)}` : value;
 
         switch(actionType) {
             case "Line":
-                (this._object as Konva.Line).stroke(color);
-                break;
             case "Square":
-                (this._object as Konva.Rect).stroke(color);
-                break;
             case "Circle":
-                (this._object as Konva.Circle).stroke(color);
+                this._object.setAttribute("stroke", this._strokeColor);
                 break;
             default:
                 assertUnreachable(actionType);
         }
     }
-    set cornerRadius(value: number) {
+    setCornerRadius(value: number) {
         const actionType = this._actionType;
         this._cornerRadius = value;
 
@@ -267,7 +268,8 @@ export class Drawing {
             case "Line":
                 break;
             case "Square":
-                (this._object as Konva.Rect).cornerRadius(this._cornerRadius);
+                this._object.setAttribute("rx", this._cornerRadius.toString());
+                this._object.setAttribute("ry", this._cornerRadius.toString());
                 break;
             case "Circle":
                 break;
@@ -275,31 +277,28 @@ export class Drawing {
                 assertUnreachable(actionType);
         }
     }
-    set fillColor(value: number) {
+    setFillColor(value: number | string) {
         const actionType = this._actionType;
-        this._fillColor = value;
-        const color = this._getFillColor();
+        this._fillColor = typeof value === "number" ? `#${value.toString(16)}` : value;
 
         switch(actionType) {
             case "Line":
                 break;
             case "Square":
-                (this._object as Konva.Rect).fill(color);
-                break;
             case "Circle":
-                (this._object as Konva.Circle).fill(color);
+                this._object.setAttribute("fill", this._fillColor);
                 break;
             default:
                 assertUnreachable(actionType);
         }
     }
-    set tempFinalPath(value: Coords) {
+    setTempFinalPath(value: Coords) {
         const actionType = this._actionType;
         this._tempFinalPath = value;
 
         switch(actionType) {
             case "Line":
-                (this._object as Konva.Line).points([...this._origin, ...this._path, ...this._tempFinalPath])
+                this._object.setAttribute("d", `${this._toSVGPath("M", this._origin)}${this._toSVGPath("L", this._path)}${this._toSVGPath("L", this._tempFinalPath)}`);
                 break;
             case "Square":
                 break;
@@ -310,10 +309,10 @@ export class Drawing {
         }
     }
 
-    get xMousePos() {
+    getXMousePos() {
         return this._origin[0] + this._width;
     }
-    get yMousePos() {
+    getYMousePos() {
         return this._origin[1] + this._height;
     }
 

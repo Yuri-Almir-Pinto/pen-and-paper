@@ -1,4 +1,5 @@
 import Konva from "konva";
+import type { Drawing } from "./canvas/Drawing";
 
 
 
@@ -13,30 +14,26 @@ declare global {
         path: number[]
         origin: Coords
         strokeWidth: number
-        strokeColor: number
+        strokeColor: number | string
     }
 
     interface SquareData {
-        x: number
-        y: number
+        origin: Coords
         width: number
         height: number
-        fillColor: number
-        strokeColor: number
+        fillColor: number | string
+        strokeColor: number | string
         strokeWidth: number
         cornerRadius: number
-        transparent: boolean
     }
 
     interface CircleData {
-        x: number
-        y: number
+        origin: Coords
         width: number
         height: number
-        fillColor: number
-        strokeColor: number
+        fillColor: number | string
+        strokeColor: number | string
         strokeWidth: number
-        transparent: boolean
     }
 
     interface Size {
@@ -59,7 +56,7 @@ declare global {
         keydownHandler: CustomKeyboardEventHandler
     }
     
-    type CustomMouseEventHandler = (event: Konva.KonvaEventObject<MouseEvent>) => void
+    type CustomMouseEventHandler = (event: MouseEvent) => void
     type CustomKeyboardEventHandler = (event: KeyboardEvent) => void
 
     interface HTMLElement {
@@ -72,6 +69,10 @@ declare global {
 
     interface Array<T> {
         toVector2d: (this: number[]) => {x: number, y: number}[]
+    }
+
+    interface SVGElement {
+        PenAndPaper: Drawing
     }
 }
   

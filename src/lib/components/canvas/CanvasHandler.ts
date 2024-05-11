@@ -1,32 +1,29 @@
-import Konva from "konva";
 import * as DRAWING from "./Drawing";
 import * as COLLECTION from "./DrawingCollection";
 import { assertUnreachable } from "../utils/general"
 import { CanvasEventsHandler } from "./canvasEventsHandler";
 
 export class CanvasHandler implements IMouseEvents {
-    private _app: Konva.Stage
+    private _app: SVGElement
     private _actions: COLLECTION.ActionCollection
     private _isClick: boolean = false;
     private _originClickCoords?: Coords
 
-    currentMode: InteractionType = "DrawCircle"
-    fillColor: number = 0x00000000
-    strokeColor: number = 0xFF5555
+    currentMode: InteractionType = "DrawSquare"
+    fillColor: number | string = "none"
+    strokeColor: number | string = 0xFF5555
     strokeWidth: number = 2
     roundedCorners: number = 10
     transparent: boolean = false
 
-    constructor(app: Konva.Stage) {
+    constructor(app: SVGElement) {
         this._app = app;
-        const layer = new Konva.Layer();
-        this._app.add(layer);
-        this._actions = new COLLECTION.ActionCollection(layer);
+        this._actions = new COLLECTION.ActionCollection(this._app);
 
         new CanvasEventsHandler(this, this._app);
     }
 
-    mouseDownHandler(event: Konva.KonvaEventObject<MouseEvent>) {
+    mouseDownHandler(event: MouseEvent) {
         switch(this.currentMode) {
             case "DrawLine":
                 this._startDrawing("Line", event)
@@ -42,7 +39,7 @@ export class CanvasHandler implements IMouseEvents {
         }
     }
 
-    mouseUpHandler(event: Konva.KonvaEventObject<MouseEvent>) {
+    mouseUpHandler(event: MouseEvent) {
         switch(this.currentMode) {
             case "DrawLine":
                 this._stopDrawing("Line")
@@ -58,7 +55,7 @@ export class CanvasHandler implements IMouseEvents {
         }
     }
 
-    mouseClickHandler(event: Konva.KonvaEventObject<MouseEvent>) {
+    mouseClickHandler(event: MouseEvent) {
         this._isClick = true;
         switch(this.currentMode) {
             case "DrawLine":
@@ -74,10 +71,10 @@ export class CanvasHandler implements IMouseEvents {
         }
     }
 
-    mouseDoubleClickHandler(event: Konva.KonvaEventObject<MouseEvent>) {
+    mouseDoubleClickHandler(event: MouseEvent) {
     }
 
-    mouseMoveHandler(event: Konva.KonvaEventObject<MouseEvent>) {
+    mouseMoveHandler(event: MouseEvent) {
         switch(this.currentMode) {
             case "DrawLine":
                 if (this._actions.isDrawing)
@@ -110,18 +107,34 @@ export class CanvasHandler implements IMouseEvents {
                 }
                 break;
             case "KeyZ":
-                if (event.ctrlKey) {
+                /*if (event.ctrlKey) {
                     this._actions.undoAction();
+                }*/
+                break;
+            case "KeyD":
+                for (let i = 0; i < 100; i++) {
+                    const square = DRAWING.Drawing.newSquare({
+                        origin: [Math.random() * 1000, Math.random() * 1000],
+                        width: 50,
+                        height: 50,
+                        fillColor: this.fillColor,
+                        strokeColor: "blue",
+                        strokeWidth: this.strokeWidth,
+                        cornerRadius: this.roundedCorners,
+                    });
+
+                    this._actions.addCurrentDrawing(square);
+                    this._actions.commitCurrentDrawing();
                 }
                 break;
         }
     }
 
-    private _startDrawing(type: ActionType, event: Konva.KonvaEventObject<MouseEvent>) {
+    private _startDrawing(type: ActionType, event: MouseEvent) {
         if (this._actions.isDrawing)
             return;
 
-        const { evt: { layerX: x, layerY: y } } = event;
+        const { layerX: x, layerY: y } = event;
         this._originClickCoords = [x, y];
 
         switch(type) {
@@ -137,29 +150,25 @@ export class CanvasHandler implements IMouseEvents {
                 break;
             case "Square":
                 const square = DRAWING.Drawing.newSquare({
-                    x: x,
-                    y: y,
+                    origin: [x, y],
                     width: x - this._originClickCoords[0],
                     height: y - this._originClickCoords[1],
                     fillColor: this.fillColor,
                     strokeColor: this.strokeColor,
                     strokeWidth: this.strokeWidth,
                     cornerRadius: this.roundedCorners,
-                    transparent: this.transparent
                 });
 
                 this._actions.addCurrentDrawing(square);
                 break;
             case "Circle":
                     const circle = DRAWING.Drawing.newCircle({
-                        x: x,
-                        y: y,
+                        origin: [x, y],
                         width: x - this._originClickCoords[0],
                         height: y - this._originClickCoords[1],
                         fillColor: this.fillColor,
                         strokeColor: this.strokeColor,
                         strokeWidth: this.strokeWidth,
-                        transparent: this.transparent
                     });
     
                 this._actions.addCurrentDrawing(circle);
@@ -169,19 +178,19 @@ export class CanvasHandler implements IMouseEvents {
         }
     }
 
-    private _progressDrawing(type: ActionType, event: Konva.KonvaEventObject<MouseEvent>, { isClick = false } = {}) {
-        const { evt: { layerX: x, layerY: y } } = event;
+    private _progressDrawing(type: ActionType, event: MouseEvent, { isClick = false } = {}) {
+        const { layerX: x, layerY: y } = event;
 
         switch(type) {
             case "Line":
                 if (isClick) {
                     this._actions.progressCurrentDrawing((action) => {
-                        action.path = [...action.path, x, y];
+                        action.setPath([...action.getPath(), x, y]);
                     })
                 }
 
                 this._actions.progressCurrentDrawing((action) => {
-                    action.tempFinalPath = [x, y]
+                    action.setTempFinalPath([x, y]);
                 });
 
                 break;
@@ -192,7 +201,7 @@ export class CanvasHandler implements IMouseEvents {
                 }
 
                 this._actions.progressCurrentDrawing((action) => {
-                    action.size({ 
+                    action.setSize({ 
                         width: x - this._originClickCoords![0],
                         height: y - this._originClickCoords![1]
                     });
@@ -206,7 +215,7 @@ export class CanvasHandler implements IMouseEvents {
                 }
 
                 this._actions.progressCurrentDrawing((action) => {
-                    action.size({ 
+                    action.setSize({ 
                         width: x - this._originClickCoords![0],
                         height: y - this._originClickCoords![1]
                     });
