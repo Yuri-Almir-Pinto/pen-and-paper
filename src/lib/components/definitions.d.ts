@@ -41,7 +41,7 @@ declare global {
         height: number,
     }
 
-    type UndoFunction = () => void
+    type UndoFunction = () => boolean
 
     type UndoStack = Map<UndoFunction, boolean>
     

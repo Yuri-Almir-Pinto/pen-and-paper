@@ -1,7 +1,7 @@
 import * as DRAWING from "./Drawing";
 import * as COLLECTION from "./DrawingCollection";
 import { assertUnreachable } from "../utils/general"
-import { CanvasEventsHandler } from "./canvasEventsHandler";
+import { CanvasEventsHandler } from "./CanvasEventsHandler";
 
 export class CanvasHandler implements IMouseEvents {
     private _app: SVGElement
@@ -9,7 +9,7 @@ export class CanvasHandler implements IMouseEvents {
     private _isClick: boolean = false;
     private _originClickCoords?: Coords
 
-    currentMode: InteractionType = "DrawSquare"
+    currentMode: InteractionType = "DrawLine"
     fillColor: number | string = "none"
     strokeColor: number | string = 0xFF5555
     strokeWidth: number = 2
@@ -56,15 +56,16 @@ export class CanvasHandler implements IMouseEvents {
     }
 
     mouseClickHandler(event: MouseEvent) {
-        this._isClick = true;
         switch(this.currentMode) {
             case "DrawLine":
                 if (this._actions.isDrawing)
                     this._progressDrawing("Line", event, { isClick: true })
                 break;
             case "DrawSquare":
+                this._stopDrawing("Square");
                 break;
             case "DrawCircle":
+                this._stopDrawing("Circle");
                 break;
             default:
                 assertUnreachable(this.currentMode);
@@ -231,9 +232,7 @@ export class CanvasHandler implements IMouseEvents {
 
         switch(type) {
             case "Line":
-                if (!this._isClick) {
-                    this._actions.commitCurrentDrawing({ includeTempFinalPath });
-                }
+                this._actions.commitCurrentDrawing({ includeTempFinalPath });
                 break;
             case "Square":
                 this._actions.commitCurrentDrawing();

@@ -18,13 +18,3 @@
 <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" bind:this={SVG}>
   <rect width="100" height="100" x="50" y="50"/>
 </svg>
-
-<style>
-  #canvas {
-    margin: 0;
-    padding: 0;
-    width: 95vw;
-    height: 95vh;
-    background-color: cyan;
-  }
-</style>

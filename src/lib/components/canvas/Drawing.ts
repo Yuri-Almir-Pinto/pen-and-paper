@@ -1,4 +1,3 @@
-import Konva from "konva";
 import { assertUnreachable } from "../utils/general";
 
 export class Drawing {

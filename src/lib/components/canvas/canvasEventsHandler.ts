@@ -1,12 +1,8 @@
 import { assertUnreachable } from "../utils/general";
-import Konva from "konva";
-import * as GEN from "../utils/general";
 
 enum EventType {
     up, down, click, doubleClick, move, keydown
 }
-
-
 
 export class CanvasEventsHandler {
     private _mouseDownHandler: CustomMouseEventHandler
@@ -58,7 +54,6 @@ export class CanvasEventsHandler {
     }
 
     private _handleMouseUp(event: MouseEvent) {
-        const { layerX: x, layerY: y } = event;
         if (Date.now() - this._sinceLastDown < 100) {
 
             this._fire(EventType.click, event);
@@ -68,8 +63,9 @@ export class CanvasEventsHandler {
 
             this._sinceLastClick = Date.now();
         }
-
-        this._fire(EventType.up, event);
+        else {
+            this._fire(EventType.up, event);
+        }
     }
 
     private _handleMouseMove(event: MouseEvent) {
