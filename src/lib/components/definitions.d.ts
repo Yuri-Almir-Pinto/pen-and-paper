@@ -43,6 +43,10 @@ declare global {
         width: number,
         height: number,
     }
+
+    type UndoFunction = () => void
+
+    type UndoStack = Map<UndoFunction, boolean>
     
     type SparseArray<T> = (T | undefined)[];
     

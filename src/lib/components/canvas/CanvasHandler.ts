@@ -1,6 +1,6 @@
 import Konva from "konva";
-import * as ACTION from "./Action";
-import * as COLLECTION from "./ActionCollection";
+import * as DRAWING from "./Drawing";
+import * as COLLECTION from "./DrawingCollection";
 import { assertUnreachable } from "../utils/general"
 import { CanvasEventsHandler } from "./canvasEventsHandler";
 
@@ -10,7 +10,7 @@ export class CanvasHandler implements IMouseEvents {
     private _isClick: boolean = false;
     private _originClickCoords?: Coords
 
-    currentMode: InteractionType = "DrawSquare"
+    currentMode: InteractionType = "DrawCircle"
     fillColor: number = 0x00000000
     strokeColor: number = 0xFF5555
     strokeWidth: number = 2
@@ -109,6 +109,11 @@ export class CanvasHandler implements IMouseEvents {
                     this._actions.clear();
                 }
                 break;
+            case "KeyZ":
+                if (event.ctrlKey) {
+                    this._actions.undoAction();
+                }
+                break;
         }
     }
 
@@ -121,7 +126,7 @@ export class CanvasHandler implements IMouseEvents {
 
         switch(type) {
             case "Line":
-                const line = ACTION.Action.newLine({
+                const line = DRAWING.Drawing.newLine({
                     strokeColor: this.strokeColor,
                     origin: [x, y],
                     path: [x, y],
@@ -131,7 +136,7 @@ export class CanvasHandler implements IMouseEvents {
                 this._actions.addCurrentDrawing(line);
                 break;
             case "Square":
-                const square = ACTION.Action.newSquare({
+                const square = DRAWING.Drawing.newSquare({
                     x: x,
                     y: y,
                     width: x - this._originClickCoords[0],
@@ -146,7 +151,7 @@ export class CanvasHandler implements IMouseEvents {
                 this._actions.addCurrentDrawing(square);
                 break;
             case "Circle":
-                    const circle = ACTION.Action.newCircle({
+                    const circle = DRAWING.Drawing.newCircle({
                         x: x,
                         y: y,
                         width: x - this._originClickCoords[0],

@@ -1,22 +1,22 @@
 import Konva from "konva";
 import { assertUnreachable } from "../utils/general";
 
-export class Action {
+export class Drawing {
     private _actionType: ActionType = "Line";
-    private _path: number[] = [];
-    private _origin: Coords = [0, 0];
-    private _height: number = 0;
-    private _width: number = 0;
-    private _strokeWidth: number = 0;
-    private _strokeColor: number = 0;
-    private _fillColor: number = 0;
-    private _cornerRadius: number = 0;
-    private _object: Konva.Shape = new Konva.Line();
+    private _path: number[] = []
+    private _origin: Coords = [0, 0]
+    private _height: number = 0
+    private _width: number = 0
+    private _strokeWidth: number = 0
+    private _strokeColor: number = 0
+    private _fillColor: number = 0
+    private _cornerRadius: number = 0
+    private _object: Konva.Shape = new Konva.Line()
     private _transparentFill: boolean = false
-
+    private _undoStack: UndoStack = new Map()
     private _tempFinalPath?: Coords
 
-    commit({ includeTempFinalPath = false } = {}) {
+    commit({ includeTempFinalPath = false } = {}): UndoStack {
         const actionType = this._actionType;
 
         switch(actionType) {
@@ -35,10 +35,11 @@ export class Action {
         }
 
         this._tempFinalPath = undefined;
+        return this._undoStack;
     }
 
-    static newLine({ strokeWidth, strokeColor, origin, path }: LineData): Action {
-        const action = new Action();
+    static newLine({ strokeWidth, strokeColor, origin, path }: LineData): Drawing {
+        const action = new Drawing();
 
         action._actionType = "Line";
         action._path = path;
@@ -60,8 +61,8 @@ export class Action {
         return action;
     }
 
-    static newSquare({ x, y, width, height, fillColor, strokeColor, strokeWidth, cornerRadius, transparent }: SquareData): Action {
-        const action = new Action();
+    static newSquare({ x, y, width, height, fillColor, strokeColor, strokeWidth, cornerRadius, transparent }: SquareData): Drawing {
+        const action = new Drawing();
 
         action._actionType = "Square";
         action._origin = [x, y];
@@ -90,8 +91,8 @@ export class Action {
         return action;
     }
 
-    static newCircle({ x, y, width, height, fillColor, strokeColor, strokeWidth, transparent }: CircleData): Action {
-        const action = new Action();
+    static newCircle({ x, y, width, height, fillColor, strokeColor, strokeWidth, transparent }: CircleData): Drawing {
+        const action = new Drawing();
 
         action._actionType = "Circle";
         action._origin = [x, y];
