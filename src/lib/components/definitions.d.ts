@@ -6,7 +6,7 @@ import type { Drawing } from "./canvas/Drawing";
 declare global {
     type ActionType = "Line" | "Square" | "Circle"
     
-    type InteractionType = "DrawLine" | "DrawSquare" | "DrawCircle"
+    type InteractionType = "DrawLine" | "DrawSquare" | "DrawCircle" | "Move"
     
     type Coords = [number, number];
     

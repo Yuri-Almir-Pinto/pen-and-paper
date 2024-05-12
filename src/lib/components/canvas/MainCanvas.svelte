@@ -1,9 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import * as PIXI from "pixi.js";
-  import Konva from "konva";
   import { CanvasHandler } from "./CanvasHandler";
-    import { stages } from "konva/lib/Stage";
 
   let SVG: SVGElement;
 

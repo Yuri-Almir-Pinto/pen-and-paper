@@ -8,8 +8,8 @@
 - Desenho de círculo
 - Desenho de quadrado
 - Desenho de (Ou triângulo ou losângulo)
-### Em progresso -
 - Função de mover canvas
+### Em progresso -
 - Função de zoom canvas
 - Função de seleção com arraste do mouse
 - Função de edição de formas
