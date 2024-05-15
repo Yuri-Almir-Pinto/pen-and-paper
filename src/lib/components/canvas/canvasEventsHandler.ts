@@ -1,7 +1,7 @@
 import { assertUnreachable } from "../utils/general";
 
 enum EventType {
-    up, down, click, doubleClick, move, keydown
+    up, down, click, doubleClick, move, keydown, keyup, wheel
 }
 
 export class CanvasEventsHandler {
@@ -11,13 +11,15 @@ export class CanvasEventsHandler {
     private _mouseDoubleClickHandler: CustomMouseEventHandler
     private _mouseMoveHandler: CustomMouseEventHandler
     private _keydownHandler: CustomKeyboardEventHandler
-    private _handler: IMouseEvents
+    private _keyupHandler: CustomKeyboardEventHandler
+    private _wheelHandler: CustomWheelEventHandler
+    private _handler: IEventHandlers
     private _downMousePostion!: Coords
     private _sinceLastDown: number = Date.now()
     private _sinceLastClick: number = Date.now()
     static acceptableRange: number = 25
 
-    constructor(handler: IMouseEvents, app: SVGElement) {
+    constructor(handler: IEventHandlers, app: SVGElement) {
         this._handler = handler;
         this._mouseDownHandler = handler.mouseDownHandler;
         this._mouseUpHandler = handler.mouseUpHandler;
@@ -25,16 +27,20 @@ export class CanvasEventsHandler {
         this._mouseDoubleClickHandler = handler.mouseDoubleClickHandler;
         this._mouseMoveHandler = handler.mouseMoveHandler;
         this._keydownHandler = handler.keydownHandler;
+        this._keyupHandler = handler.keyUpHandler;
+        this._wheelHandler = handler.wheelHandler;
 
         app.addEventListener("mousedown", (event: MouseEvent) => this._handleMouseDown(event));
         app.addEventListener("mouseup", (event: MouseEvent) => this._handleMouseUp(event));
         app.addEventListener("mousemove", (event: MouseEvent) => this._handleMouseMove(event));
         app.addEventListener("keydown", (event: KeyboardEvent) => this._handleKeyDown(event));
+        app.addEventListener("keyup", (event: KeyboardEvent) => this._handleKeyUp(event));
+        app.addEventListener("wheel", (event: WheelEvent) => this._handleWheel(event));
 
         app.tabIndex = 0;
     }
 
-    private _fire(type: EventType, event: MouseEvent | KeyboardEvent) {
+    private _fire(type: EventType, event: MouseEvent | KeyboardEvent | WheelEvent) {
         switch(type) {
             case EventType.click: this._mouseClickHandler.call(this._handler, event as MouseEvent); return;
             case EventType.doubleClick: this._mouseDoubleClickHandler.call(this._handler, event as MouseEvent); return;
@@ -42,6 +48,8 @@ export class CanvasEventsHandler {
             case EventType.down: this._mouseDownHandler.call(this._handler, event as MouseEvent); return;
             case EventType.move: this._mouseMoveHandler.call(this._handler, event as MouseEvent); return;
             case EventType.keydown: this._keydownHandler.call(this._handler, event as KeyboardEvent); return;
+            case EventType.keyup: this._keyupHandler.call(this._handler, event as KeyboardEvent); return;
+            case EventType.wheel: this._wheelHandler.call(this._handler, event as WheelEvent); return;
             default: assertUnreachable(type);
         }
     }
@@ -75,5 +83,13 @@ export class CanvasEventsHandler {
 
     private _handleKeyDown(event: KeyboardEvent) {
         this._fire(EventType.keydown, event);
+    }
+
+    private _handleKeyUp(event: KeyboardEvent) {
+        this._fire(EventType.keyup, event);
+    }
+
+    private _handleWheel(event: WheelEvent) {
+        this._fire(EventType.wheel, event);
     }
 }

@@ -20,15 +20,27 @@ export class Drawing {
         this._object = SVG;
     }
 
-    commit({ includeTempFinalPath = false } = {}): UndoStack {
+    commit({ includeTempFinalPath = false } = {}): [UndoStack, boolean] {
         const actionType = this._actionType;
+        let shouldSelfDelete = false;
 
         switch(actionType) {
             case "Line":
-                if (includeTempFinalPath && this._tempFinalPath != undefined)
+                if (this._origin[0] === this._path[0] && this._origin[1] === this._path[1]) {
+                    this._path.splice(0, 2);
+                }
+
+                if (this._path.length === 0 && !includeTempFinalPath) {
+                    shouldSelfDelete = true;
+                }
+
+                if (includeTempFinalPath && this._tempFinalPath != undefined) {
                     this._object.setAttribute("d", `${this._toSVGPath("M", this._origin)}${this._toSVGPath("L", this._path)}${this._toSVGPath("L", this._tempFinalPath)}`);
-                else
+                }
+                else {
                     this._object.setAttribute("d", `${this._toSVGPath("M", this._origin)}${this._toSVGPath("L", this._path)}`);
+                }
+
                 break;
             case "Square":
                 break;
@@ -39,14 +51,13 @@ export class Drawing {
         }
 
         this._tempFinalPath = undefined;
-        return this._undoStack;
+        return [this._undoStack, shouldSelfDelete];
     }
 
-    static newLine({ strokeWidth, strokeColor, origin, path }: LineData): Drawing {
+    static newLine({ strokeWidth, strokeColor, origin }: LineData): Drawing {
         const action = new Drawing(document.createElementNS(Drawing.ns, "path"));
 
         action._actionType = "Line";
-        action._path = path;
         action._origin = origin;
         action._strokeWidth = strokeWidth;
         action._strokeColor = typeof strokeColor === "number" ? `#${strokeColor.toString(16)}` : strokeColor;
@@ -55,6 +66,7 @@ export class Drawing {
         drawing.setAttribute("stroke", action._strokeColor);
         drawing.setAttribute("stroke-width", action._strokeWidth.toString());
         drawing.setAttribute("fill", "none");
+        drawing.setAttribute("stroke-linecap", "round");
         drawing.setAttribute("d", `M${action._origin[0]} ${action._origin[1]} ${action._toSVGPath("L", action._path)}`)
         drawing.PenAndPaper = action;
 
@@ -119,7 +131,7 @@ export class Drawing {
     }
 
     private _toSVGPath(action: string, path: number[]): string {
-        if (path.length % 2 !== 0)
+        if (path.length % 2 !== 0 || path.length === 0)
             return "";
 
         let returnString = "";

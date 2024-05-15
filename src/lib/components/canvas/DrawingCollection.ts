@@ -42,17 +42,26 @@ export class ActionCollection {
     // Adiciona ação no layer, na lista, e desenha ela.
     addAction({ includeTempFinalPath = false } = {}, ...actions: SparseArray<DRAWING.Drawing>) {
         for (let i = 0; i < actions.length; i++) {
-            if (actions[i] != undefined) {
-                const undoFunctions = actions[i]?.commit({ includeTempFinalPath });
+            if (actions[i] == null)
+                continue;
 
-                if (undoFunctions == undefined)
-                    break;
+            const result = actions[i]?.commit({ includeTempFinalPath });
 
-                for (let undoFunction of undoFunctions.keys())
-                    this._undoStack.push(undoFunction);
+            if (result == null)
+                continue;
 
-                undoFunctions.clear();
+            if (result[1]) {
+                actions[i]?.getObject().parentElement?.removeChild(actions[i]?.getObject()!);
+                actions[i] = undefined;
+                continue;
             }
+
+            const undoFunctions = result[0]
+
+            for (let undoFunction of undoFunctions.keys())
+                this._undoStack.push(undoFunction);
+
+            undoFunctions.clear();
         }
         
         this._actions.push(...actions);

@@ -11,7 +11,6 @@ declare global {
     type Coords = [number, number];
     
     interface LineData {
-        path: number[]
         origin: Coords
         strokeWidth: number
         strokeColor: number | string
@@ -47,17 +46,20 @@ declare global {
     
     type SparseArray<T> = (T | undefined)[];
     
-    interface IMouseEvents {
-        mouseDownHandler: CustomMouseEventHandler,
-        mouseUpHandler: CustomMouseEventHandler,
-        mouseClickHandler: CustomMouseEventHandler,
-        mouseDoubleClickHandler: CustomMouseEventHandler,
+    interface IEventHandlers {
+        mouseDownHandler: CustomMouseEventHandler
+        mouseUpHandler: CustomMouseEventHandler
+        mouseClickHandler: CustomMouseEventHandler
+        mouseDoubleClickHandler: CustomMouseEventHandler
         mouseMoveHandler: CustomMouseEventHandler
         keydownHandler: CustomKeyboardEventHandler
+        keyUpHandler: CustomKeyboardEventHandler
+        wheelHandler: CustomWheelEventHandler
     }
     
     type CustomMouseEventHandler = (event: MouseEvent) => void
     type CustomKeyboardEventHandler = (event: KeyboardEvent) => void
+    type CustomWheelEventHandler = (event: WheelEvent) => void
 
     interface HTMLElement {
         getLocalCords: (coords: MouseEvent) => TYPES.Coords;
