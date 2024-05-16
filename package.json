@@ -11,9 +11,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@tauri-apps/api": "^1",
-    "konva": "^9.3.6",
-    "pixi.js": "^8.1.1"
+    "@tauri-apps/api": "^1"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^3.0.1",

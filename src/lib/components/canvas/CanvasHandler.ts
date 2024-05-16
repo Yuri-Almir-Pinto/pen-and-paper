@@ -98,24 +98,23 @@ export class CanvasHandler implements IEventHandlers {
     }
 
     wheelHandler(event: WheelEvent) {
-        const inOrOut = event.deltaY < 0 ? "in" : "out"
-        const zoomChange = inOrOut === "in" ? 0.85 : 1.15
-        const newZoom = this._zoom * zoomChange;
-        const [distanceX, distanceY] = this._getViewPosDistancePercentage(event);
-        const [originX, originY] = this._viewPos;
-        const [oldWidth, oldHeight] = this._getSVGViewBoxSize();
-        const [newWidth, newHeight] = [this._getViewWidth() * newZoom, this._getViewHeight() * newZoom];
-        const [diffWidth, diffHeight] = [oldWidth - newWidth, oldHeight - newHeight];
-
-        const newOrigin = [
-            originX + (distanceX * diffWidth),
-            originY + (distanceY * diffHeight),
-        ] as Coords;
-
         if (event.ctrlKey) {
-            this._changeViewBox({ newPos: newOrigin, newZoom: this._zoom * zoomChange });
-        }
-            
+            const inOrOut = event.deltaY < 0 ? "in" : "out"
+            const zoomChange = inOrOut === "in" ? 0.85 : 1.15
+            const newZoom = this._zoom * zoomChange;
+            const [distanceX, distanceY] = this._getViewPosDistancePercentage(event);
+            const [originX, originY] = this._viewPos;
+            const [oldWidth, oldHeight] = this._getSVGViewBoxSize();
+            const [newWidth, newHeight] = [this._getViewWidth() * newZoom, this._getViewHeight() * newZoom];
+            const [diffWidth, diffHeight] = [oldWidth - newWidth, oldHeight - newHeight];
+
+            const newOrigin = [
+                originX + (distanceX * diffWidth),
+                originY + (distanceY * diffHeight),
+            ] as Coords;
+
+                this._changeViewBox({ newPos: newOrigin, newZoom: this._zoom * zoomChange });
+            }
     }
 
     //#endregion
@@ -356,15 +355,6 @@ export class CanvasHandler implements IEventHandlers {
         ]
 
         return distanceCenterPercentage as Coords
-    }
-
-    private _getViewPosCenter(): Coords {
-        const viewPosCenter = [
-            this._viewPos[0] + (this._getViewWidth() / 2),
-            this._viewPos[1] + (this._getViewHeight() / 2)
-        ]
-
-        return viewPosCenter as Coords;
     }
 
     private _getViewWidth() {
