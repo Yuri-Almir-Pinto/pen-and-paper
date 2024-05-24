@@ -2,6 +2,16 @@ import * as DRAWING from "./Drawing";
 import * as COLLECTION from "./DrawingCollection";
 import { assertUnreachable } from "../utils/general"
 import { CanvasEventsHandler } from "./CanvasEventsHandler";
+import "../utils/EventDispatcher";
+import EventDispatcher from "../utils/EventDispatcher";
+
+export type DrawingParams = {
+    currentMode?: InteractionType
+    fillColor?: number | string
+    strokeColor?: number | string
+    strokeWidth?: number
+    roundedCorners?: number
+}
 
 export class CanvasHandler implements IEventHandlers {
     private _app: SVGElement
@@ -14,11 +24,36 @@ export class CanvasHandler implements IEventHandlers {
     private _zoom: number = 1
     private _viewPos: Coords = [0, 0]
 
-    currentMode: InteractionType = "DrawLine"
+    currentMode: InteractionType = "Move"
     fillColor: number | string = "none"
     strokeColor: number | string = 0xFF5555
     strokeWidth: number = 2
     roundedCorners: number = 10
+
+    paramsChangedEvent: EventDispatcher<DrawingParams> = new EventDispatcher();
+
+    setParams(params: DrawingParams) {
+        const { currentMode, fillColor, strokeColor, strokeWidth, roundedCorners } = params;
+
+        if (currentMode !== undefined)
+            this.currentMode = currentMode;
+        if (fillColor !== undefined)
+            this.fillColor = fillColor;
+        if (strokeColor !== undefined)
+            this.strokeColor = strokeColor;
+        if (strokeWidth !== undefined)
+            this.strokeWidth = strokeWidth;
+        if (roundedCorners !== undefined)
+            this.roundedCorners = roundedCorners;
+
+        this.paramsChangedEvent.call({ 
+            currentMode: this.currentMode, 
+            fillColor: this.fillColor, 
+            strokeColor: this.strokeColor, 
+            strokeWidth: this.strokeWidth, 
+            roundedCorners: this.roundedCorners 
+        });
+    }
 
 
     constructor(app: SVGElement) {
@@ -161,7 +196,7 @@ export class CanvasHandler implements IEventHandlers {
 
                 this._isKeyPressed[event.code] = true
                 this._previousMode = this.currentMode;
-                this.currentMode = "Move";
+                this.setParams({ currentMode: "Move" });
                 break;
         }
     }
@@ -169,7 +204,7 @@ export class CanvasHandler implements IEventHandlers {
     keyUpHandler(event: KeyboardEvent) {
         switch(event.code) {
             case "Space":
-                this.currentMode = this._previousMode;
+                this.setParams({ currentMode: this._previousMode });
                 this._isKeyPressed[event.code] = false;
                 break;
         }

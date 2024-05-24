@@ -11,7 +11,10 @@
 - Função de mover canvas
 - Função de zoom canvas
 ### Em progresso -
-- Ferramentas de mudança de parâmetros
 - Função de seleção com arraste do mouse
 - Função de edição de formas
+
+
+### Baixa prioridade -
+- Ferramentas de mudança de parâmetros
 - Função de undo (Ctrl + Z)
