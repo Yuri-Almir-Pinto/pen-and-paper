@@ -43,7 +43,7 @@ export class BaseSvg implements IsShape {
             this.svg = svgType;
     }
     
-    scale([scaleX, scaleY]: [number, number]): void {
+    scale(scaleX: number, scaleY: number): void {
         this.svg.setAttribute("transform", `scale(${scaleX}, ${scaleY})`);
     }
     fillColor(fillColor: string | number): void {
@@ -56,6 +56,7 @@ export class BaseSvg implements IsShape {
         this.svg.setAttribute("stroke-width", strokeWidth.toString());
     }
     is<T extends keyof SvgType>(type: T): this is SvgType[T] {
+        console.error("Some SVG class called the base SVG 'is'. This should not happen.");
         return type === "never"
     }
 }
@@ -65,17 +66,22 @@ export class SvgSquare extends BaseSvg implements IsShape  {
         super("rect");
     }
 
-    origin([x, y]: [number, number]): void {
+    origin(x: number, y: number): void {
         this.svg.setAttribute("x", x.toString());
         this.svg.setAttribute("y", y.toString());
     }
-    size(width: number, height: number): void {
-        this.svg.setAttribute("width", width.toString());
-        this.svg.setAttribute("height", height.toString());
+    size(width: number, height: number, x: number, y: number): void {
+        this.svg.setAttribute("width", Math.abs(width === 0 ? 1 : width).toString());
+        this.svg.setAttribute("height", Math.abs(height === 0 ? 1 : height).toString());
+        x = width > 0 ? x : x + width;
+        y = height > 0 ? y : y + width;
+        
+        this.svg.setAttribute("x", x.toString());
+        this.svg.setAttribute("y", y.toString());
     }
     borderRadius(radius: number): void {
-        this.svg.setAttribute("rx", radius.toString());
-        this.svg.setAttribute("ry", radius.toString());
+        this.svg.setAttribute("rx", Math.abs(radius).toString());
+        this.svg.setAttribute("ry", Math.abs(radius).toString());
     }
     is<T extends keyof SvgType>(type: T): this is SvgType[T] {
         return type === "square"
@@ -87,13 +93,20 @@ export class SvgCircle extends BaseSvg implements IsShape  {
         super("ellipse");
     }
 
-    origin(x: number, y: number): void {
-        this.svg.setAttribute("cx", x.toString());
-        this.svg.setAttribute("cy", y.toString());
+    origin(cx: number, cy: number): void {
+        this.svg.setAttribute("cx", cx.toString());
+        this.svg.setAttribute("cy", cy.toString());
     }
-    size(width: number, height: number): void {
-        this.svg.setAttribute("rx", Math.abs(width/2 === 0 ? 1 : width/2).toString());
-        this.svg.setAttribute("ry", Math.abs(height/2 === 0 ? 1 : height/2).toString());
+    size(width: number, height: number, cx: number, cy: number): void {
+        width = width/2;
+        height = height/2;
+        this.svg.setAttribute("rx", Math.abs(width === 0 ? 1 : width).toString());
+        this.svg.setAttribute("ry", Math.abs(height === 0 ? 1 : height).toString());
+        const xPos = width > 0 ? cx + width : (cx + width) - width;
+        const yPos = height > 0 ? cy + height : (cy + height) - height;
+        
+        this.svg.setAttribute("cx", xPos.toString());
+        this.svg.setAttribute("cy", yPos.toString());
     }
     is<T extends keyof SvgType>(type: T): this is SvgType[T] {
         return type === "circle"
