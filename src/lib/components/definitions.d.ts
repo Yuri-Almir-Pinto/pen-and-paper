@@ -1,8 +1,6 @@
 import Konva from "konva";
 import type { Drawing } from "./canvas/Drawing";
 
-
-
 declare global {
     type ActionType = "Line" | "Square" | "Circle"
     
