@@ -1,39 +1,15 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import * as Handler from "./CanvasHandler";
+  import CanvasHandler from "./CanvasHandlers/CanvasHandler";
 
   let SVG: SVGElement;
-  let drawer: Handler.CanvasHandler;
+  let drawer: CanvasHandler;
   let app: HTMLDivElement;
 
   onMount(mount)
 
   async function mount(): Promise<any> {
-    drawer = new Handler.CanvasHandler(SVG);
-    drawer.paramsChangedEvent.addEvent(interactionChanged);
-  }
-
-  function interactionChanged(params: Handler.DrawingParams): void {
-    if (app == null || params.currentMode == null)
-      return;
-
-    const toSelect = app.querySelector(`button[data-interaction=${params.currentMode}]`)
-    const selected = app.querySelector(`button.selected`);
-
-    if (toSelect == null || selected == null)
-      return; 
-
-    selected.classList.remove("selected");
-    toSelect.classList.add("selected");
-  }
-
-  function interactionButtonClicked(event: MouseEvent) {
-    const data = (event.target as HTMLButtonElement).dataset["interaction"];
-
-    if (data !== "Move" && data !== "DrawLine" && data !== "DrawSquare" && data !== "DrawCircle")
-      return;
-
-    drawer.setParams({ currentMode: data })
+    drawer = new CanvasHandler(SVG);
   }
 
 </script>

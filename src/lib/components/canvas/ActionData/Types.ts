@@ -46,6 +46,8 @@ export interface CanvasStateDTO {
     readonly strokeWidth: number
     readonly roundedCorners: number
     readonly zoom: number
+    readonly viewX: number
+    readonly viewY: number
 }
 
 export interface KeyboardDTO {
@@ -64,6 +66,8 @@ export interface MouseDTO {
     readonly layerY: number
     readonly svgX: number
     readonly svgY: number
+    readonly prevSvgX: number
+    readonly prevSvgY: number
     readonly altPressed: boolean
     readonly shiftPressed: boolean
     readonly timestamp: number

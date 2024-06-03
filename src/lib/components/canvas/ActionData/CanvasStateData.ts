@@ -31,7 +31,23 @@ export default class CanvasStateData implements CanvasStateDTO {
     }
 
     commit(): CanvasStateDTO {
-        return Object.freeze(this);
+        return Object.freeze({ ...this });
+    }
+
+    private _previous?: InteractionType
+    toggleMove(value: boolean) {
+        if (value === true) {
+            this._previous = this.currentMode;
+            this.currentMode = "Move"
+        }
+        else {
+            this.currentMode = this._previous!;
+            this._previous = undefined;
+        }
+    }
+
+    isMoveToggled() {
+        return this._previous != null;
     }
 
     static default(): CanvasStateData {

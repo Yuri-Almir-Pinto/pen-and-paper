@@ -30,11 +30,9 @@ export default class KeyboardData implements KeyboardDTO {
     }
 
     commit(): KeyboardDTO {
-        const previousKeys = this.keysPressed;
-        this.keysPressed = Object.freeze(this.keysPressed);
-        const frozen = Object.freeze(this);
-        this.keysPressed = previousKeys;
-
+        const frozenKeysPressed = Object.freeze(new Map([...this.keysPressed]));
+        const frozen = Object.freeze({ ...this, keysPressed: frozenKeysPressed });
+    
         return frozen;
     }
 

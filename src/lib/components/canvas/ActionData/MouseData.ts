@@ -12,6 +12,8 @@ export default class MouseData implements MouseDTO {
     layerY: number
     svgX: number
     svgY: number
+    prevSvgX: number
+    prevSvgY: number
     altPressed: boolean
     shiftPressed: boolean
     timestamp: number
@@ -23,6 +25,8 @@ export default class MouseData implements MouseDTO {
         this.layerY = 0;
         this.svgX = 0;
         this.svgY = 0;
+        this.prevSvgX = 0;
+        this.prevSvgY = 0;
         this.altPressed = false;
         this.shiftPressed = false;
         this.wheel = "none"
@@ -41,6 +45,11 @@ export default class MouseData implements MouseDTO {
         this.altPressed = event.altKey;
         this.shiftPressed = event.shiftKey;
 
+        if (event.type === "mousedown") {
+            this.prevSvgX = this.svgX;
+            this.prevSvgY = this.svgY;
+        }
+
         if (event.deltaY != null)
             this.wheel = event.deltaY < 0 ? "up" : event.deltaY > 0 ? "down" : "none";
         else
@@ -48,7 +57,10 @@ export default class MouseData implements MouseDTO {
 
         this.moved = event.type === "mousemoved";
 
-        const toSet = event.type === "mousedown" ? "pressed" : event.type === "mouseup" ? "released" : "none";
+        const toSet = event.type === "mousedown" ? "pressed" : event.type === "mouseup" ? "released" : null;
+
+        if (toSet == null)
+            return;
 
         if (event.button === 0)
             this.left = toSet;
@@ -59,7 +71,7 @@ export default class MouseData implements MouseDTO {
     }
 
     commit(): MouseDTO {
-        return Object.freeze(this);
+        return Object.freeze({ ...this });
     }
 
     updateButtons() {
