@@ -1,8 +1,8 @@
-import type { CanvasActionDTO } from "../ActionData/Types"
-import CanvasActionData from "../ActionData/CanvasActionData"
-import CanvasStateData from "../ActionData/CanvasStateData"
-import KeyboardData from "../ActionData/KeyboardData"
-import MouseData from "../ActionData/MouseData"
+import type { CanvasActionDTO } from "../CanvasData/Types"
+import CanvasActionData from "../CanvasData/CanvasActionData"
+import CanvasStateData from "../CanvasData/CanvasStateData"
+import KeyboardData from "../CanvasData/KeyboardData"
+import MouseData from "../CanvasData/MouseData"
 import { isKeyboardEvent, isMouseEvent, isWheelEvent, setAllEvents } from "../utils/EventFunctions"
 import { main } from "./CanvasAction"
 
@@ -18,6 +18,7 @@ export default class CanvasHandler {
         this._keyboard = new KeyboardData();
         this._mouse = new MouseData();
 
+        this._app.tabIndex = 1;
         setAllEvents(this._onAction, this._app, this)
         this.setViewBox(this._state.viewX, this._state.viewY, this._state.zoom);
     }
@@ -63,21 +64,27 @@ export default class CanvasHandler {
                 break;
         }
 
-        while (true) {
-            const currentState = this.assemble();
-        
-            let [nextState, shouldContinue] = main(currentState);
+        this._updateInputState();
+
+        const currentState = this.assemble();
     
-            if (nextState != null)
-                nextState(this);
+        let nextState = main(currentState);
 
-            if (shouldContinue === true)
-                continue;
-            else
-                break;
-        }
-
-        
+        if (nextState != null)
+            nextState(this);
     }
 
+    private _updateInputState() {
+        switch(true) {
+            case this._keyboard.keysPressed.get(" ") === "pressed":
+                this.toggleMove(true);
+                break;
+            case this._keyboard.keysPressed.get(" ") === "released":
+                this.toggleMove(false);
+                break;
+            default:
+                break;
+        }
+    }
+ 
 }

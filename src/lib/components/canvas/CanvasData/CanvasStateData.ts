@@ -43,6 +43,7 @@ export default class CanvasStateData implements CanvasStateDTO {
         else {
             this.currentMode = this._previous!;
             this._previous = undefined;
+            
         }
     }
 
@@ -52,7 +53,7 @@ export default class CanvasStateData implements CanvasStateDTO {
 
     static default(): CanvasStateData {
         return new CanvasStateData(
-            "Move",
+            "DrawLine",
             "transparent",
             "black",
             2,

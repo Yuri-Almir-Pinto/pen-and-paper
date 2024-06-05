@@ -1,46 +1,43 @@
-import type { CanvasActionDTO, CanvasStateDTO, KeyboardDTO, MouseDTO } from "../ActionData/Types";
+import type { CanvasActionDTO, CanvasStateDTO, KeyboardDTO, MouseDTO } from "../CanvasData/Types";
 import CanvasHandler from "./CanvasHandler";
 
 type StateChangeFunc = (canvas: CanvasHandler) => void
 
-export function main(state: CanvasActionDTO): [StateChangeFunc | void, boolean] {
-    const newState = stateChangePhase(state);
+export function main(state: CanvasActionDTO): StateChangeFunc | void {
+    const nextState = handleMode(state.canvasData, state.keyboardData, state.mouseData);
 
-    if (newState != null) return [newState, true];
-
-    const nextState = progressPhase(state);
-
-    return [nextState, false];
-}
-
-function stateChangePhase(state: CanvasActionDTO): StateChangeFunc | void {
-    switch(true) {
-        case state.keyboardData.keysPressed.get("Space") === "pressed":
-            return (state) => state.toggleMove(true); 
-        case state.keyboardData.keysPressed.get("Space") === "released":
-            return (state) => state.toggleMove(false);
-        default:
-            break;
-    }
-}
-
-function progressPhase(state: CanvasActionDTO): StateChangeFunc | void {
-    return handleMode(state.canvasData, state.keyboardData, state.mouseData)
+    return nextState;
 }
 
 function handleMode(state: CanvasStateDTO, keyboard: KeyboardDTO, mouse: MouseDTO): StateChangeFunc | void {
-    switch(state.currentMode) {
-        case "Move":
-            const newX = (mouse.prevSvgX - mouse.svgX) + state.viewX;
-            const newY = (mouse.prevSvgY - mouse.svgY) + state.viewY;
+    let nextState: StateChangeFunc | void;
 
-            if (mouse.left === "held") {
-                return (currentState) => currentState.setUIViewBox(newX, newY, state.zoom);
-            }
-            else if (mouse.left === "released") {
-                return (currentState) => currentState.setViewBox(newX, newY, state.zoom);
-            }
-        default:
-            return;
+    nextState = handleMove(state, keyboard, mouse);
+
+    return nextState;
+}
+
+function handleMove(state: CanvasStateDTO, keyboard: KeyboardDTO,  mouse: MouseDTO): StateChangeFunc | void {
+    let newX: number;
+    let newY: number;
+
+    if (state.currentMode !== "Move") {
+        if (keyboard.keysPressed.get(" ") === "released" && mouse.left === "held") {
+            newX = (mouse.prevSvgX - mouse.svgX) + state.viewX;
+            newY = (mouse.prevSvgY - mouse.svgY) + state.viewY;
+            return (currentState) => currentState.setViewBox(newX, newY, state.zoom);
+        }
+        return;
+    }
+
+    newX = (mouse.prevSvgX - mouse.svgX) + state.viewX;
+    newY = (mouse.prevSvgY - mouse.svgY) + state.viewY;
+
+    if (mouse.left === "held") {
+        return (currentState) => currentState.setUIViewBox(newX, newY, state.zoom);
+    }
+
+    if (mouse.left === "released") {
+        return (currentState) => currentState.setViewBox(newX, newY, state.zoom);
     }
 }

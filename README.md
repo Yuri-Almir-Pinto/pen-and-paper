@@ -10,7 +10,12 @@
 - Desenho de (Ou triângulo ou losângulo)
 - Função de mover canvas
 - Função de zoom canvas
-### Em progresso -
+
+### Na refatoração -
+- Classes de formatos
+- Consertar loop infinito ao clicar em tecla
+
+### Em progresso - On hold -
 - Função de seleção com arraste do mouse
 - Função de edição de formas
 
