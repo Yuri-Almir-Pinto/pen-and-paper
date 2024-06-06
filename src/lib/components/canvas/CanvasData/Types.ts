@@ -54,6 +54,7 @@ export interface KeyboardDTO {
     readonly keysPressed: ReadonlyMap<string, ButtonState>
     readonly altKey: boolean
     readonly shiftKey: boolean
+    readonly ctrlKey: boolean
     readonly timeStamp: number
 }
 

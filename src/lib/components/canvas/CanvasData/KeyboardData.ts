@@ -1,12 +1,13 @@
 import { readonly } from "svelte/store"
 import { updateButtonState, type KeyboardButtons, type KeyboardDTO } from "./Types"
 
-type RelevantKeyboardData = {timeStamp: number, shiftKey: boolean, altKey: boolean, type: string, key: string}
+type RelevantKeyboardData = {timeStamp: number, shiftKey: boolean, altKey: boolean, ctrlKey: boolean, type: string, key: string}
 
 export default class KeyboardData implements KeyboardDTO {
     keysPressed: KeyboardButtons
     altKey: boolean
     shiftKey: boolean
+    ctrlKey: boolean
     timeStamp: number
 
     constructor() {
@@ -14,12 +15,14 @@ export default class KeyboardData implements KeyboardDTO {
         this.timeStamp = 0;
         this.shiftKey = false;
         this.altKey = false;
+        this.ctrlKey = false;
     }
 
     update(event: RelevantKeyboardData) {
         this.timeStamp = event.timeStamp;
         this.shiftKey = event.shiftKey;
         this.altKey = event.altKey;
+        this.ctrlKey = event.altKey;
 
         if (event.type === "keydown") {
             this.keysPressed.set(event.key, "pressed");

@@ -4,9 +4,11 @@ import CanvasStateData from "../CanvasData/CanvasStateData"
 import KeyboardData from "../CanvasData/KeyboardData"
 import MouseData from "../CanvasData/MouseData"
 import { isKeyboardEvent, isMouseEvent, isWheelEvent, setAllEvents } from "../utils/EventFunctions"
-import { main } from "./CanvasAction"
+import { createCommands } from "./CanvasAction"
+import { Command, ResizeMainSVG, ToggleMoveMainSVG } from "../Commands/Command"
+import { CommandType, type Executable } from "../Commands/Types"
 
-export default class CanvasHandler {
+export default class CanvasHandler implements Executable {
     private _app: SVGElement
     private _state: CanvasStateData
     private _keyboard: KeyboardData
@@ -19,8 +21,21 @@ export default class CanvasHandler {
         this._mouse = new MouseData();
 
         this._app.tabIndex = 1;
-        setAllEvents(this._onAction, this._app, this)
-        this.setViewBox(this._state.viewX, this._state.viewY, this._state.zoom);
+        this._setUIViewBox(this._state.viewX, this._state.viewY, this._state.zoom);
+        setAllEvents(this._onAction, this._app, this);
+    }
+
+    execute(commands: Command[]): void {
+        for (let command of commands) {
+            switch(true) {
+                case command.is(CommandType.ResizeMainSVG):
+                    this._setViewBox(command)
+                    break;
+                case command.is(CommandType.ToggleMoveMainSVG):
+                    this._toggleMove(command);
+                    break;
+            }
+        }
     }
 
     assemble(): CanvasActionDTO {
@@ -31,23 +46,28 @@ export default class CanvasHandler {
         )
     }
 
-    toggleMove(value: boolean) {
-        this._state.toggleMove(value);
+    private _toggleMove(command: ToggleMoveMainSVG | boolean) {
+        if ("boolean" === typeof command)
+            this._state.toggleMove(command);
+        else
+            this._state.toggleMove(command.value)
     }
 
-    setUIViewBox(viewX: number, viewY: number, zoom: number) {
+    private _setViewBox(command: ResizeMainSVG) {
+        if (command.definitive === true) {
+            this._state.viewX = command.viewX;
+            this._state.viewY = command.viewY;
+            this._state.zoom = command.zoom;
+        }
+
+        this._setUIViewBox(command.viewX, command.viewY, command.zoom);
+    }
+
+    private _setUIViewBox(viewX: number, viewY: number, zoom: number) {
         const containerWidth = this._app.parentElement?.clientWidth as number;
         const containerHeight = this._app.parentElement?.clientHeight as number;
         
         this._app.setAttribute("viewBox", `${viewX} ${viewY} ${containerWidth * zoom} ${containerHeight * zoom}`)
-    }
-
-    setViewBox(viewX: number, viewY: number, zoom: number) {
-        this._state.viewX = viewX;
-        this._state.viewY = viewY;
-        this._state.zoom = zoom;
-
-        this.setUIViewBox(viewX, viewY, zoom);
     }
 
     private _onAction(event: KeyboardEvent | MouseEvent | WheelEvent) {
@@ -68,23 +88,16 @@ export default class CanvasHandler {
 
         const currentState = this.assemble();
     
-        let nextState = main(currentState);
-
-        if (nextState != null)
-            nextState(this);
+        const commands = createCommands(currentState);
+        
+        this.execute(commands);
     }
 
     private _updateInputState() {
-        switch(true) {
-            case this._keyboard.keysPressed.get(" ") === "pressed":
-                this.toggleMove(true);
-                break;
-            case this._keyboard.keysPressed.get(" ") === "released":
-                this.toggleMove(false);
-                break;
-            default:
-                break;
-        }
+        const spaceState = this._keyboard.keysPressed.get(" ");
+        const toggle = spaceState === "pressed" ? true : spaceState === "released" ? false : null
+        if (toggle != null)
+            this._toggleMove(toggle);
     }
  
 }

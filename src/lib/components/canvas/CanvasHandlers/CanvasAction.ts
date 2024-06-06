@@ -1,43 +1,38 @@
-import type { CanvasActionDTO, CanvasStateDTO, KeyboardDTO, MouseDTO } from "../CanvasData/Types";
+import type { CanvasActionDTO } from "../CanvasData/Types";
+import { ResizeMainSVG, type Command } from "../Commands/Command";
 import CanvasHandler from "./CanvasHandler";
 
 type StateChangeFunc = (canvas: CanvasHandler) => void
 
-export function main(state: CanvasActionDTO): StateChangeFunc | void {
-    const nextState = handleMode(state.canvasData, state.keyboardData, state.mouseData);
+export function createCommands(state: CanvasActionDTO): Command[] {
+    const commands: Command[] = [];
 
-    return nextState;
+    moveCommand(state, commands);
+
+    return commands;
 }
 
-function handleMode(state: CanvasStateDTO, keyboard: KeyboardDTO, mouse: MouseDTO): StateChangeFunc | void {
-    let nextState: StateChangeFunc | void;
-
-    nextState = handleMove(state, keyboard, mouse);
-
-    return nextState;
-}
-
-function handleMove(state: CanvasStateDTO, keyboard: KeyboardDTO,  mouse: MouseDTO): StateChangeFunc | void {
+function moveCommand(state: CanvasActionDTO, commands: Command[]): StateChangeFunc | void {
+    const { canvasData, mouseData, keyboardData } = state;
+    const spaceState = keyboardData.keysPressed.get(" ");
     let newX: number;
     let newY: number;
+    let dataSet: boolean = false;
 
-    if (state.currentMode !== "Move") {
-        if (keyboard.keysPressed.get(" ") === "released" && mouse.left === "held") {
-            newX = (mouse.prevSvgX - mouse.svgX) + state.viewX;
-            newY = (mouse.prevSvgY - mouse.svgY) + state.viewY;
-            return (currentState) => currentState.setViewBox(newX, newY, state.zoom);
-        }
-        return;
+    if (canvasData.currentMode === "Move" || spaceState === "pressed" || spaceState === "held") {
+        newX = (mouseData.prevSvgX - mouseData.svgX) + canvasData.viewX;
+        newY = (mouseData.prevSvgY - mouseData.svgY) + canvasData.viewY;
+        dataSet = true;
     }
 
-    newX = (mouse.prevSvgX - mouse.svgX) + state.viewX;
-    newY = (mouse.prevSvgY - mouse.svgY) + state.viewY;
-
-    if (mouse.left === "held") {
-        return (currentState) => currentState.setUIViewBox(newX, newY, state.zoom);
+    if (mouseData.left === "held" && dataSet === true) {
+        const command = new ResizeMainSVG(newX!, newY!, canvasData.zoom);
+        command.definitive = false;
+        commands.push(command);
     }
 
-    if (mouse.left === "released") {
-        return (currentState) => currentState.setViewBox(newX, newY, state.zoom);
+    if (mouseData.left === "released" && dataSet === true) {
+        const command = new ResizeMainSVG(newX!, newY!, canvasData.zoom);
+        commands.push(command);
     }
 }
