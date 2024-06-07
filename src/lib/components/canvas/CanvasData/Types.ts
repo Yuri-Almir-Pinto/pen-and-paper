@@ -1,6 +1,12 @@
-export type ButtonState = "none" | "pressed" | "held" | "released"
+import type { Interaction } from "../CanvasHandlers/Types";
 
-export type WheelState = "none" | "up" | "down"
+export enum ButtonState {
+    None, Pressed, Held, Released
+}
+
+export enum WheelState {
+    None, Up, Down
+}
 
 type ButtonStateObject = Map<string, ButtonState>
 
@@ -18,17 +24,17 @@ export function updateButtonState(state: ButtonState | ButtonStateObject): Butto
     }
 
     function update(toUpdate: ButtonState): ButtonState {
-        if (toUpdate === "pressed")
-            return "held";
-        if (toUpdate === "released")
-            return "none";
+        if (toUpdate === ButtonState.Pressed)
+            return ButtonState.Held;
+        if (toUpdate === ButtonState.Released)
+            return ButtonState.None;
 
         return toUpdate;
     }
 }
 
 export function updateWheelState(state: WheelState): WheelState {
-    return "none"
+    return WheelState.None
 }
 
 export type MouseButtons = {
@@ -40,7 +46,7 @@ export type MouseButtons = {
 export type KeyboardButtons = ButtonStateObject
 
 export interface CanvasStateDTO {
-    readonly currentMode: InteractionType
+    readonly currentMode: Interaction
     readonly fillColor: number | string
     readonly strokeColor: number | string
     readonly strokeWidth: number

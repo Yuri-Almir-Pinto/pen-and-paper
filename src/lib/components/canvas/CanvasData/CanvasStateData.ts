@@ -1,7 +1,8 @@
+import { Interaction } from "../CanvasHandlers/Types"
 import type { CanvasStateDTO } from "./Types"
 
 export default class CanvasStateData implements CanvasStateDTO {
-    currentMode: InteractionType
+    currentMode: Interaction
     fillColor: number | string
     strokeColor: number | string
     strokeWidth: number
@@ -15,7 +16,7 @@ export default class CanvasStateData implements CanvasStateDTO {
     viewHeight: number
 
     constructor(
-        currentMode: InteractionType, 
+        currentMode: Interaction, 
         fillColor: number | string, 
         strokeColor: number | string, 
         strokeWidth: number, 
@@ -61,11 +62,11 @@ export default class CanvasStateData implements CanvasStateDTO {
         this.viewHeight = parseInt(splitViewBox[3])
     }
 
-    private _previous?: InteractionType
+    private _previous?: Interaction
     toggleMove(value: boolean) {
         if (value === true) {
             this._previous = this.currentMode;
-            this.currentMode = "Move"
+            this.currentMode = Interaction.Move
         }
         else {
             this.currentMode = this._previous!;
@@ -88,7 +89,7 @@ export default class CanvasStateData implements CanvasStateDTO {
 
     static default(): CanvasStateData {
         return new CanvasStateData(
-            "DrawLine",
+            Interaction.DrawLine,
             "transparent",
             "black",
             2,

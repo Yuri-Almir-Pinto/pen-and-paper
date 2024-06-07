@@ -13,13 +13,12 @@ export function setAllEvents(handler: (event: Event) => void, element: SVGElemen
 }
 
 function throttle<T extends (...args: any[]) => void>(func: T, delay: number): (...args: Parameters<T>) => void {
-    let lastCall = 0; // Timestamp of the last function call
+    let lastCall = 0;
   
     return function(this: any, ...args: Parameters<T>) {
-        const now = Date.now(); // Current timestamp
+        const now = Date.now();
         const elapsed = now - lastCall;
     
-        // If enough time has passed since the last call, execute the function
         if (elapsed >= delay) {
             func.apply(this, args);
             lastCall = now;

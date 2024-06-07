@@ -1,5 +1,5 @@
 import { readonly } from "svelte/store"
-import { updateButtonState, type KeyboardButtons, type KeyboardDTO } from "./Types"
+import { ButtonState, updateButtonState, type KeyboardButtons, type KeyboardDTO } from "./Types"
 
 type RelevantKeyboardData = {timeStamp: number, shiftKey: boolean, altKey: boolean, ctrlKey: boolean, type: string, key: string}
 
@@ -25,10 +25,10 @@ export default class KeyboardData implements KeyboardDTO {
         this.ctrlKey = event.ctrlKey;
 
         if (event.type === "keydown") {
-            this.keysPressed.set(event.key, "pressed");
+            this.keysPressed.set(event.key, ButtonState.Pressed);
         }
         else if (event.type === "keyup") {
-            this.keysPressed.set(event.key, "released");
+            this.keysPressed.set(event.key, ButtonState.Released);
         }
     }
 

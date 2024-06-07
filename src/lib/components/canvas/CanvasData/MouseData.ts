@@ -1,4 +1,4 @@
-import { type MouseButtons, type ButtonState, type WheelState, type MouseDTO, updateButtonState, updateWheelState } from "./Types"
+import { type MouseButtons, ButtonState, WheelState, type MouseDTO, updateButtonState, updateWheelState } from "./Types"
 
 type RelevantMouseData = {timeStamp: number, shiftKey: boolean, altKey: boolean, layerX: number, 
     layerY: number, deltaY?: number, button: number, type: string }
@@ -29,10 +29,10 @@ export default class MouseData implements MouseDTO {
         this.prevSvgY = 0;
         this.altPressed = false;
         this.shiftPressed = false;
-        this.wheel = "none"
-        this.left = "none";
-        this.right = "none";
-        this.middle = "none";
+        this.wheel = WheelState.None
+        this.left = ButtonState.None;
+        this.right = ButtonState.None;
+        this.middle = ButtonState.None;
         this.moved = false;
     }
 
@@ -51,13 +51,13 @@ export default class MouseData implements MouseDTO {
         }
 
         if (event.deltaY != null)
-            this.wheel = event.deltaY < 0 ? "up" : event.deltaY > 0 ? "down" : "none";
+            this.wheel = event.deltaY < 0 ? WheelState.Up : event.deltaY > 0 ? WheelState.Down : WheelState.None;
         else
-            this.wheel = "none";
+            this.wheel = WheelState.None;
 
         this.moved = event.type === "mousemoved";
 
-        const toSet = event.type === "mousedown" ? "pressed" : event.type === "mouseup" ? "released" : null;
+        const toSet = event.type === "mousedown" ? ButtonState.Pressed: event.type === "mouseup" ? ButtonState.Released : null;
 
         if (toSet == null)
             return;

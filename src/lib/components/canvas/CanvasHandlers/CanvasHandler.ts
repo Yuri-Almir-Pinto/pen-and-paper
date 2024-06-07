@@ -1,4 +1,4 @@
-import type { CanvasActionDTO } from "../CanvasData/Types"
+import { ButtonState, type CanvasActionDTO } from "../CanvasData/Types"
 import CanvasActionData from "../CanvasData/CanvasActionData"
 import CanvasStateData from "../CanvasData/CanvasStateData"
 import KeyboardData from "../CanvasData/KeyboardData"
@@ -97,10 +97,10 @@ export default class CanvasHandler implements Executable {
     private _updateInputState() {
         const spaceState = this._keyboard.keysPressed.get(" ");
         switch(spaceState) {
-            case "pressed":
+            case ButtonState.Pressed:
                 this._toggleMove(true)
                 break;
-            case "released":
+            case ButtonState.Released:
                 this._toggleMove(false)
                 break;
         }

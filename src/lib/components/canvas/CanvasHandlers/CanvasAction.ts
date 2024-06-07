@@ -1,8 +1,6 @@
-import type { CanvasActionDTO } from "../CanvasData/Types";
+import { ButtonState, WheelState, type CanvasActionDTO } from "../CanvasData/Types";
 import { ResizeMainSVG, type Command } from "../Commands/Command";
-import CanvasHandler from "./CanvasHandler";
-
-type StateChangeFunc = (canvas: CanvasHandler) => void
+import { Interaction } from "./Types";
 
 export function createCommands(state: CanvasActionDTO): Command[] {
     const commands: Command[] = [];
@@ -16,10 +14,10 @@ export function createCommands(state: CanvasActionDTO): Command[] {
 function zoomCommand(state: CanvasActionDTO, commands: Command[]): void {
     const { keyboardData, mouseData, canvasData } = state;
 
-    if (keyboardData.ctrlKey === false || mouseData.wheel == "none")
+    if (keyboardData.ctrlKey === false || mouseData.wheel == WheelState.None)
         return;
 
-    const inOrOut = mouseData.wheel === "up" ? "in" : "out"
+    const inOrOut = mouseData.wheel === WheelState.Up ? "in" : "out"
     const zoomChange = inOrOut === "in" ? 0.85 : 1.15
     const newZoom = canvasData.zoom * zoomChange;
     // Calcula a distância do topo/esquerda para o mouse em % (Um mouse totalmente a esquerda seria 0, totalmente a direita seria 1, no meio 0.5, etc)
@@ -52,19 +50,19 @@ function moveCommand(state: CanvasActionDTO, commands: Command[]): void {
     let newY: number;
     let dataSet: boolean = false;
 
-    if (canvasData.currentMode === "Move" || spaceState === "pressed" || spaceState === "held") {
+    if (canvasData.currentMode === Interaction.Move || spaceState === ButtonState.Pressed || spaceState === ButtonState.Held) {
         newX = (mouseData.prevSvgX - mouseData.svgX) + canvasData.viewX;
         newY = (mouseData.prevSvgY - mouseData.svgY) + canvasData.viewY;
         dataSet = true;
     }
 
-    if (mouseData.left === "held" && dataSet === true) {
+    if (mouseData.left === ButtonState.Held && dataSet === true) {
         const command = new ResizeMainSVG(newX!, newY!, canvasData.zoom);
         command.temporary = true;
         commands.push(command);
     }
 
-    if (mouseData.left === "released" && dataSet === true) {
+    if (mouseData.left === ButtonState.Released && dataSet === true) {
         const command = new ResizeMainSVG(newX!, newY!, canvasData.zoom);
         commands.push(command);
     }
