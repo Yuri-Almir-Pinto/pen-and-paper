@@ -8,11 +8,44 @@ export function createCommands(state: CanvasActionDTO): Command[] {
     const commands: Command[] = [];
 
     moveCommand(state, commands);
+    zoomCommand(state, commands);
 
     return commands;
 }
 
-function moveCommand(state: CanvasActionDTO, commands: Command[]): StateChangeFunc | void {
+function zoomCommand(state: CanvasActionDTO, commands: Command[]): void {
+    const { keyboardData, mouseData, canvasData } = state;
+
+    if (keyboardData.ctrlKey === false || mouseData.wheel == "none")
+        return;
+
+    const inOrOut = mouseData.wheel === "up" ? "in" : "out"
+    const zoomChange = inOrOut === "in" ? 0.85 : 1.15
+    const newZoom = canvasData.zoom * zoomChange;
+    // Calcula a distância do topo/esquerda para o mouse em % (Um mouse totalmente a esquerda seria 0, totalmente a direita seria 1, no meio 0.5, etc)
+    const distanceX = canvasData.leftDistancePercentage(mouseData.layerX);
+    const distanceY = canvasData.topDistancePercentage(mouseData.layerY);
+    
+    const originX = canvasData.viewX;
+    const originY = canvasData.viewY;
+    
+    const oldWidth = canvasData.viewWidth;
+    const oldHeight = canvasData.viewHeight;
+    // Pega o tamanho do SVG em si, e aplica o zoom nele.
+    const newWidth = canvasData.svgWidth * newZoom;
+    const newHeight = canvasData.svgHeight * newZoom;
+    
+    const diffWidth = oldWidth - newWidth;
+    const diffHeight = oldHeight - newHeight;
+    // Calcula a nova posição da origem da tela, de forma que a posição do mouse dentro do SVG se mantenha a mesma após o zoom.
+    const newOriginX = originX + (distanceX * diffWidth);
+    const newOriginY = originY + (distanceY * diffHeight);
+
+    const command = new ResizeMainSVG(newOriginX, newOriginY, newZoom);
+    commands.push(command);
+}
+
+function moveCommand(state: CanvasActionDTO, commands: Command[]): void {
     const { canvasData, mouseData, keyboardData } = state;
     const spaceState = keyboardData.keysPressed.get(" ");
     let newX: number;
@@ -27,7 +60,7 @@ function moveCommand(state: CanvasActionDTO, commands: Command[]): StateChangeFu
 
     if (mouseData.left === "held" && dataSet === true) {
         const command = new ResizeMainSVG(newX!, newY!, canvasData.zoom);
-        command.definitive = false;
+        command.temporary = true;
         commands.push(command);
     }
 

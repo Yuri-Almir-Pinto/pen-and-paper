@@ -48,6 +48,12 @@ export interface CanvasStateDTO {
     readonly zoom: number
     readonly viewX: number
     readonly viewY: number
+    readonly svgWidth: number
+    readonly svgHeight: number
+    readonly viewWidth: number
+    readonly viewHeight: number
+    leftDistancePercentage(svgX: number): number
+    topDistancePercentage(svgY: number): number
 }
 
 export interface KeyboardDTO {

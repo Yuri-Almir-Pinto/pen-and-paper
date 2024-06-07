@@ -9,6 +9,10 @@ export default class CanvasStateData implements CanvasStateDTO {
     zoom: number
     viewX: number
     viewY: number
+    svgWidth: number
+    svgHeight: number
+    viewWidth: number
+    viewHeight: number
 
     constructor(
         currentMode: InteractionType, 
@@ -18,7 +22,11 @@ export default class CanvasStateData implements CanvasStateDTO {
         roundedCorners: number,
         zoom: number,
         viewX: number,
-        viewY: number) {
+        viewY: number,
+        svgWidth: number,
+        svgHeight: number,
+        viewWidth: number,
+        viewHeight: number) {
 
         this.currentMode = currentMode;
         this.fillColor = fillColor;
@@ -28,10 +36,29 @@ export default class CanvasStateData implements CanvasStateDTO {
         this.zoom = zoom;
         this.viewX = viewX;
         this.viewY = viewY;
+        this.svgWidth = svgWidth;
+        this.svgHeight = svgHeight;
+        this.viewWidth = viewWidth;
+        this.viewHeight = viewHeight;
     }
 
     commit(): CanvasStateDTO {
         return Object.freeze({ ...this });
+    }
+
+    update(svg: SVGElement) {
+        this.svgHeight = svg.parentElement?.clientHeight as number;
+        this.svgWidth = svg.parentElement?.clientWidth as number;
+
+        const viewBox = svg.getAttribute("viewBox");
+
+        if (viewBox == null)
+            return;
+
+        const splitViewBox = viewBox.split(" ");
+
+        this.viewWidth = parseInt(splitViewBox[2]);
+        this.viewHeight = parseInt(splitViewBox[3])
     }
 
     private _previous?: InteractionType
@@ -51,6 +78,14 @@ export default class CanvasStateData implements CanvasStateDTO {
         return this._previous != null;
     }
 
+    leftDistancePercentage(svgX: number): number {
+        return svgX / this.svgWidth;
+    }
+    
+    topDistancePercentage(svgY: number): number {
+        return svgY / this.svgHeight;
+    }
+
     static default(): CanvasStateData {
         return new CanvasStateData(
             "DrawLine",
@@ -59,6 +94,10 @@ export default class CanvasStateData implements CanvasStateDTO {
             2,
             10,
             1,
+            0,
+            0,
+            0,
+            0,
             0,
             0
         )

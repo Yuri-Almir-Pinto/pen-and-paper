@@ -40,9 +40,9 @@ export default class CanvasHandler implements Executable {
 
     assemble(): CanvasActionDTO {
         return CanvasActionData.new(
-            this._mouse.commit(),
-            this._keyboard.commit(),
-            this._state.commit(),
+            this._mouse,
+            this._keyboard,
+            this._state,
         )
     }
 
@@ -54,7 +54,7 @@ export default class CanvasHandler implements Executable {
     }
 
     private _setViewBox(command: ResizeMainSVG) {
-        if (command.definitive === true) {
+        if (command.temporary === false) {
             this._state.viewX = command.viewX;
             this._state.viewY = command.viewY;
             this._state.zoom = command.zoom;
@@ -83,6 +83,7 @@ export default class CanvasHandler implements Executable {
                 this._mouse.update(event, this._state.zoom, this._state.viewX, this._state.viewY);
                 break;
         }
+        this._state.update(this._app);
 
         this._updateInputState();
 
@@ -95,9 +96,14 @@ export default class CanvasHandler implements Executable {
 
     private _updateInputState() {
         const spaceState = this._keyboard.keysPressed.get(" ");
-        const toggle = spaceState === "pressed" ? true : spaceState === "released" ? false : null
-        if (toggle != null)
-            this._toggleMove(toggle);
+        switch(spaceState) {
+            case "pressed":
+                this._toggleMove(true)
+                break;
+            case "released":
+                this._toggleMove(false)
+                break;
+        }
     }
  
 }

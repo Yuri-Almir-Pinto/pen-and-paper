@@ -22,7 +22,7 @@ export default class KeyboardData implements KeyboardDTO {
         this.timeStamp = event.timeStamp;
         this.shiftKey = event.shiftKey;
         this.altKey = event.altKey;
-        this.ctrlKey = event.altKey;
+        this.ctrlKey = event.ctrlKey;
 
         if (event.type === "keydown") {
             this.keysPressed.set(event.key, "pressed");
