@@ -1,4 +1,4 @@
-import type { Interaction } from "../CanvasHandlers/Types";
+import type { Interaction } from "../Controllers/Types";
 
 export enum ButtonState {
     None, Pressed, Held, Released

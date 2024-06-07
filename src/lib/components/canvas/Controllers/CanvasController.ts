@@ -1,24 +1,24 @@
-import { ButtonState, type CanvasActionDTO } from "../CanvasData/Types"
-import CanvasActionData from "../CanvasData/CanvasActionData"
-import CanvasStateData from "../CanvasData/CanvasStateData"
-import KeyboardData from "../CanvasData/KeyboardData"
-import MouseData from "../CanvasData/MouseData"
+import { ButtonState, type CanvasActionDTO } from "../State/Types"
+import CanvasCommandData from "../State/CanvasCommandState"
+import CanvasState from "../State/CanvasStateState"
+import KeyboardState from "../State/KeyboardState"
+import MouseState from "../State/MouseState"
 import { isKeyboardEvent, isMouseEvent, isWheelEvent, setAllEvents } from "../utils/EventFunctions"
-import { createCommands } from "./CanvasAction"
+import { createCommands } from "./ActionController"
 import { Command, ResizeMainSVG, ToggleMoveMainSVG } from "../Commands/Command"
 import { CommandType, type Executable } from "../Commands/Types"
 
 export default class CanvasHandler implements Executable {
     private _app: SVGElement
-    private _state: CanvasStateData
-    private _keyboard: KeyboardData
-    private _mouse: MouseData
+    private _state: CanvasState
+    private _keyboard: KeyboardState
+    private _mouse: MouseState
 
     constructor(app: SVGElement) {
         this._app = app;
-        this._state = CanvasStateData.default();
-        this._keyboard = new KeyboardData();
-        this._mouse = new MouseData();
+        this._state = CanvasState.default();
+        this._keyboard = new KeyboardState();
+        this._mouse = new MouseState();
 
         this._app.tabIndex = 1;
         this._setUIViewBox(this._state.viewX, this._state.viewY, this._state.zoom);
@@ -39,7 +39,7 @@ export default class CanvasHandler implements Executable {
     }
 
     assemble(): CanvasActionDTO {
-        return CanvasActionData.new(
+        return CanvasCommandData.new(
             this._mouse,
             this._keyboard,
             this._state,

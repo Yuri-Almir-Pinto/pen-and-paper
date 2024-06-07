@@ -1,7 +1,7 @@
-import { Interaction } from "../CanvasHandlers/Types"
+import { Interaction } from "../Controllers/Types"
 import type { CanvasStateDTO } from "./Types"
 
-export default class CanvasStateData implements CanvasStateDTO {
+export default class CanvasState implements CanvasStateDTO {
     currentMode: Interaction
     fillColor: number | string
     strokeColor: number | string
@@ -87,8 +87,8 @@ export default class CanvasStateData implements CanvasStateDTO {
         return svgY / this.svgHeight;
     }
 
-    static default(): CanvasStateData {
-        return new CanvasStateData(
+    static default(): CanvasState {
+        return new CanvasState(
             Interaction.DrawLine,
             "transparent",
             "black",

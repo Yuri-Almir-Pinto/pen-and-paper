@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import CanvasHandler from "./CanvasHandlers/CanvasHandler";
+  import CanvasHandler from "./Controllers/CanvasController";
 
   let SVG: SVGElement;
   let drawer: CanvasHandler;

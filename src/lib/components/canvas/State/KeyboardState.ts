@@ -3,7 +3,7 @@ import { ButtonState, updateButtonState, type KeyboardButtons, type KeyboardDTO 
 
 type RelevantKeyboardData = {timeStamp: number, shiftKey: boolean, altKey: boolean, ctrlKey: boolean, type: string, key: string}
 
-export default class KeyboardData implements KeyboardDTO {
+export default class KeyboardState implements KeyboardDTO {
     keysPressed: KeyboardButtons
     altKey: boolean
     shiftKey: boolean

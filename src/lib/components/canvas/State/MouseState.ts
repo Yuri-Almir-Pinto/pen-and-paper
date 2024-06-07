@@ -3,7 +3,7 @@ import { type MouseButtons, ButtonState, WheelState, type MouseDTO, updateButton
 type RelevantMouseData = {timeStamp: number, shiftKey: boolean, altKey: boolean, layerX: number, 
     layerY: number, deltaY?: number, button: number, type: string }
 
-export default class MouseData implements MouseDTO {
+export default class MouseState implements MouseDTO {
     left: ButtonState
     right: ButtonState
     middle: ButtonState

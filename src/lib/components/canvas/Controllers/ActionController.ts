@@ -1,4 +1,4 @@
-import { ButtonState, WheelState, type CanvasActionDTO } from "../CanvasData/Types";
+import { ButtonState, WheelState, type CanvasActionDTO } from "../State/Types";
 import { ResizeMainSVG, type Command } from "../Commands/Command";
 import { Interaction } from "./Types";
 

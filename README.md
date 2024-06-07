@@ -17,6 +17,10 @@
 - Comandos para as funções do Canvas
     - Função de zoom
 
+### Bugs -
+- Ao clicar com o mouse, mover, e apertar espaço, a tela move instantaneamente para o mouse. O comportamento esperado é a tela apenas acompanahr
+o movimento do mouse.
+
 ### Em progresso - On hold -
 - Função de seleção com arraste do mouse
 - Função de edição de formas

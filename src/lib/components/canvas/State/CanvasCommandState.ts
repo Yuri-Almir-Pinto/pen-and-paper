@@ -1,6 +1,6 @@
 import type { MouseDTO, CanvasStateDTO, KeyboardDTO, CanvasActionDTO } from "./Types"
 
-export default class CanvasActionData {
+export default class CanvasCommandData {
     mouseData: MouseDTO
     keyboardData: KeyboardDTO
     canvasData: CanvasStateDTO
@@ -12,6 +12,6 @@ export default class CanvasActionData {
     }
 
     static new(mouseDTO: MouseDTO, keyboardDTO: KeyboardDTO, canvasDTO: CanvasStateDTO): CanvasActionDTO {
-        return Object.freeze(new CanvasActionData(mouseDTO, keyboardDTO, canvasDTO));
+        return Object.freeze(new CanvasCommandData(mouseDTO, keyboardDTO, canvasDTO));
     }
 }
