@@ -1,15 +1,15 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import CanvasHandler from "./Controllers/CanvasController";
+  import CanvasController from "./Controllers/CanvasController";
 
   let SVG: SVGElement;
-  let drawer: CanvasHandler;
+  let drawer: CanvasController;
   let app: HTMLDivElement;
 
   onMount(mount)
 
   async function mount(): Promise<any> {
-    drawer = new CanvasHandler(SVG);
+    drawer = new CanvasController(SVG);
   }
 
 </script>

@@ -8,7 +8,7 @@ import { createCommands } from "./ActionController"
 import { Command, ResizeMainSVG, ToggleMoveMainSVG } from "../Commands/Command"
 import { CommandType, type Executable } from "../Commands/Types"
 
-export default class CanvasHandler implements Executable {
+export default class CanvasController implements Executable {
     private _app: SVGElement
     private _state: CanvasState
     private _keyboard: KeyboardState
