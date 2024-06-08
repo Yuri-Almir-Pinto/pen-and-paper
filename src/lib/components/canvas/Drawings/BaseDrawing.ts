@@ -10,7 +10,6 @@ export class BaseDrawing<TSVG extends BaseSvg> implements Executable {
     private _fillColor: string
     private _strokeColor: string
     private _strokeWidth: number
-    private _commandInstructions: Map<CommandType, (command: BaseCommand) => void>
 
     protected constructor(svg: TSVG) {
         this.svg = svg;
@@ -19,7 +18,6 @@ export class BaseDrawing<TSVG extends BaseSvg> implements Executable {
         this._fillColor = "transparent";
         this._strokeColor = "black";
         this._strokeWidth = 2;
-        this._commandInstructions = new Map();
 
         this.svg.scale(this._scaleX, this._scaleY);
         this.svg.fillColor(this._fillColor);
@@ -29,10 +27,6 @@ export class BaseDrawing<TSVG extends BaseSvg> implements Executable {
 
     execute(commands: BaseCommand[]): void {
         throw new Error("Method not implemented.");
-    }
-
-    protected registerCommand(type: CommandType, handler: (command: BaseCommand) => void) {
-        this._commandInstructions.set(type, handler);
     }
 
     protected setScale(newScaleX: number, newScaleY: number) {

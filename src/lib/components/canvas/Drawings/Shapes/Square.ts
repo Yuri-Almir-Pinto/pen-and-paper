@@ -1,3 +1,4 @@
+import type { BaseCommand } from "../../Commands/BaseCommand";
 import { BaseDrawing } from "../BaseDrawing";
 import { SvgSquare } from "../SvgTools/SvgSquare";
 
@@ -16,6 +17,12 @@ export class Square extends BaseDrawing<SvgSquare> {
         this._width = 0;
         this._height = 0;
         this._borderRadius = 0;
+    }
+
+    execute(commands: BaseCommand[]) {
+        super.execute(commands);
+
+        throw new Error("Method not implemented.");
     }
 
     protected setOrigin(newOriginX: number, newOriginY: number) {
