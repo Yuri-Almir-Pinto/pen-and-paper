@@ -1,17 +1,19 @@
-import type { Command, ResizeMainSVG, ToggleMoveMainSVG } from "./Command";
+import type { BaseCommand } from "./BaseCommand";
+import type { ToggleMoveMainSVG } from "./ImplementedCommands/ToggleMoveMainSVG";
+import type { ResizeMainSVG } from "./ImplementedCommands/ResizeMainSVG";
 
 export enum CommandType {
-    Command,
+    BaseCommand,
     ResizeMainSVG,
     ToggleMoveMainSVG,
 }
 
 export type CommandMap = {
-    [CommandType.Command]: Command
+    [CommandType.BaseCommand]: BaseCommand
     [CommandType.ResizeMainSVG]: ResizeMainSVG
     [CommandType.ToggleMoveMainSVG]: ToggleMoveMainSVG
 }
 
 export interface Executable {
-    execute(commands: Command[]): void
+    execute(commands: BaseCommand[]): void
 }

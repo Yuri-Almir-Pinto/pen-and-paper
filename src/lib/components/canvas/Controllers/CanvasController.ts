@@ -5,7 +5,9 @@ import KeyboardState from "../State/KeyboardState"
 import MouseState from "../State/MouseState"
 import { isKeyboardEvent, isMouseEvent, isWheelEvent, setAllEvents } from "../utils/EventFunctions"
 import { createCommands } from "./ActionController"
-import { Command, ResizeMainSVG, ToggleMoveMainSVG } from "../Commands/Command"
+import { BaseCommand } from "../Commands/BaseCommand"
+import { ToggleMoveMainSVG } from "../Commands/ImplementedCommands/ToggleMoveMainSVG"
+import { ResizeMainSVG } from "../Commands/ImplementedCommands/ResizeMainSVG"
 import { CommandType, type Executable } from "../Commands/Types"
 
 export default class CanvasController implements Executable {
@@ -25,7 +27,7 @@ export default class CanvasController implements Executable {
         setAllEvents(this._onAction, this._app, this);
     }
 
-    execute(commands: Command[]): void {
+    execute(commands: BaseCommand[]): void {
         for (let command of commands) {
             switch(true) {
                 case command.is(CommandType.ResizeMainSVG):

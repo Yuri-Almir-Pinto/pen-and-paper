@@ -1,9 +1,10 @@
 import { ButtonState, WheelState, type CanvasActionDTO } from "../State/Types";
-import { ResizeMainSVG, type Command } from "../Commands/Command";
+import { type BaseCommand } from "../Commands/BaseCommand";
+import { ResizeMainSVG } from "../Commands/ImplementedCommands/ResizeMainSVG";
 import { Interaction } from "./Types";
 
-export function createCommands(state: CanvasActionDTO): Command[] {
-    const commands: Command[] = [];
+export function createCommands(state: CanvasActionDTO): BaseCommand[] {
+    const commands: BaseCommand[] = [];
 
     moveCommand(state, commands);
     zoomCommand(state, commands);
@@ -11,7 +12,7 @@ export function createCommands(state: CanvasActionDTO): Command[] {
     return commands;
 }
 
-function zoomCommand(state: CanvasActionDTO, commands: Command[]): void {
+function zoomCommand(state: CanvasActionDTO, commands: BaseCommand[]): void {
     const { keyboardData, mouseData, canvasData } = state;
 
     if (keyboardData.ctrlKey === false || mouseData.wheel == WheelState.None)
@@ -43,7 +44,7 @@ function zoomCommand(state: CanvasActionDTO, commands: Command[]): void {
     commands.push(command);
 }
 
-function moveCommand(state: CanvasActionDTO, commands: Command[]): void {
+function moveCommand(state: CanvasActionDTO, commands: BaseCommand[]): void {
     const { canvasData, mouseData, keyboardData } = state;
     const spaceState = keyboardData.keysPressed.get(" ");
     let newX: number;
