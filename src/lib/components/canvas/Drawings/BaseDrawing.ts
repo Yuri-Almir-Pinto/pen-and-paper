@@ -1,10 +1,11 @@
 import type { BaseCommand } from "../Commands/BaseCommand";
-import type { CommandType, Executable } from "../Commands/Types";
+import type { NewDrawingCanvasInfo, NewDrawingMouseInfo } from "../Commands/ImplementedCommands/NewDrawing";
+import type { Executable } from "../Commands/Types";
 import type { BaseSvg } from "./SvgTools/BaseSvg";
 import { toColor } from "./SvgTools/Functions";
 
 export class BaseDrawing<TSVG extends BaseSvg> implements Executable {
-    protected svg: TSVG
+    svg: TSVG
     private _scaleX: number
     private _scaleY: number
     private _fillColor: string
@@ -26,7 +27,13 @@ export class BaseDrawing<TSVG extends BaseSvg> implements Executable {
     }
 
     execute(commands: BaseCommand[]): void {
-        throw new Error("Method not implemented.");
+        return
+    }
+
+    protected config(canvas: NewDrawingCanvasInfo) {
+        this.setFillColor(canvas.fillColor);
+        this.setStrokeColor(canvas.strokeColor);
+        this.setStrokeWidth(canvas.strokeWidth);
     }
 
     protected setScale(newScaleX: number, newScaleY: number) {

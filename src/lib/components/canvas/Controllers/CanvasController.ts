@@ -18,7 +18,7 @@ export default class CanvasController implements Executable {
 
     constructor(app: SVGElement) {
         this._app = app;
-        this._state = CanvasState.default();
+        this._state = CanvasState.default(this._app);
         this._keyboard = new KeyboardState();
         this._mouse = new MouseState();
 
@@ -38,6 +38,8 @@ export default class CanvasController implements Executable {
                     break;
             }
         }
+
+        this._state.collection.execute(commands);
     }
 
     assemble(): CanvasActionDTO {
@@ -93,7 +95,8 @@ export default class CanvasController implements Executable {
     
         const commands = createCommands(currentState);
         
-        this.execute(commands);
+        if (commands.length > 0)
+            this.execute(commands);
     }
 
     private _updateInputState() {

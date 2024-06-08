@@ -1,9 +1,13 @@
+import { assertUnreachable } from "../../utils/general";
 import type { BaseCommand } from "../Commands/BaseCommand";
-import type { Executable } from "../Commands/Types";
+import type { NewDrawing } from "../Commands/ImplementedCommands/NewDrawing";
+import { CommandType, type Executable } from "../Commands/Types";
 import type { BaseDrawing } from "./BaseDrawing";
+import { Square } from "./Shapes/Square";
 import type { BaseSvg } from "./SvgTools/BaseSvg";
+import { DrawingType } from "./Types";
 
-export class ActionCollection implements Executable {
+export class DrawingCollection implements Executable {
     private _actions: BaseDrawing<BaseSvg>[]
     private _app: SVGElement
     private _currentlyDrawing?: BaseDrawing<BaseSvg>
@@ -14,10 +18,59 @@ export class ActionCollection implements Executable {
     }
 
     execute(commands: BaseCommand[]): void {
-        throw new Error("Method not implemented.");
+        for(let command of commands) {
+            switch(true) {
+                case command.is(CommandType.NewDrawing):
+                    this._addCurrentlyDrawing(this._newDrawing(command));
+                    break;
+                case command.is(CommandType.ProgressDrawingCreation):
+                    if (this.isDrawing === false)
+                        break;
+
+                    if (command.temporary === false) {
+                        this._currentlyDrawing?.execute([command]);
+                        this._commitCurrentlyDrawing();
+                    }
+                    else
+                        this._currentlyDrawing?.execute([command]);
+                    break;
+            }
+        }
     }
 
-    clear() {
+    private _newDrawing(command: NewDrawing): BaseDrawing<BaseSvg> {
+        switch(command.currentMode) {
+            case DrawingType.Square:
+                return Square.new(command);
+            case DrawingType.Circle:
+                console.error("Not implemented");
+                return null!;
+            case DrawingType.Path:
+                console.error("Not implemented");
+                return null!;
+            default:
+                console.error("No new drawing was created in the 'newDrawing' method. This is an error.");
+                assertUnreachable(command.currentMode);
+        }
+    }
+
+    private _commitCurrentlyDrawing() {
+        if (this.isDrawing === false)
+            return;
+
+        this._actions.push(this._currentlyDrawing!);
+        this._currentlyDrawing = undefined;
+    }
+
+    private _addCurrentlyDrawing(drawing: BaseDrawing<BaseSvg>) {
+        if (this.isDrawing === true)
+            return;
+
+        this._app.appendChild(drawing.svg.innerSvg);
+        this._currentlyDrawing = drawing;
+    }
+
+    private _clear() {
         this._actions = [];
         this._app.innerHTML = "";
     }

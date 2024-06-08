@@ -1,7 +1,10 @@
 import { Interaction } from "../Controllers/Types"
+import { DrawingCollection } from "../Drawings/DrawingCollection"
 import type { CanvasStateDTO } from "./Types"
 
 export default class CanvasState implements CanvasStateDTO {
+    collection: DrawingCollection
+
     currentMode: Interaction
     fillColor: number | string
     strokeColor: number | string
@@ -14,8 +17,10 @@ export default class CanvasState implements CanvasStateDTO {
     svgHeight: number
     viewWidth: number
     viewHeight: number
+    isDrawing: boolean
 
     constructor(
+        svg: SVGElement,
         currentMode: Interaction, 
         fillColor: number | string, 
         strokeColor: number | string, 
@@ -28,6 +33,8 @@ export default class CanvasState implements CanvasStateDTO {
         svgHeight: number,
         viewWidth: number,
         viewHeight: number) {
+            
+        this.collection = new DrawingCollection(svg);
 
         this.currentMode = currentMode;
         this.fillColor = fillColor;
@@ -41,6 +48,7 @@ export default class CanvasState implements CanvasStateDTO {
         this.svgHeight = svgHeight;
         this.viewWidth = viewWidth;
         this.viewHeight = viewHeight;
+        this.isDrawing = this.collection.isDrawing;
     }
 
     commit(): CanvasStateDTO {
@@ -59,7 +67,8 @@ export default class CanvasState implements CanvasStateDTO {
         const splitViewBox = viewBox.split(" ");
 
         this.viewWidth = parseInt(splitViewBox[2]);
-        this.viewHeight = parseInt(splitViewBox[3])
+        this.viewHeight = parseInt(splitViewBox[3]);
+        this.isDrawing = this.collection.isDrawing;
     }
 
     private _previous?: Interaction
@@ -87,9 +96,10 @@ export default class CanvasState implements CanvasStateDTO {
         return svgY / this.svgHeight;
     }
 
-    static default(): CanvasState {
+    static default(svg: SVGElement): CanvasState {
         return new CanvasState(
-            Interaction.DrawLine,
+            svg,
+            Interaction.DrawSquare,
             "transparent",
             "black",
             2,

@@ -9,7 +9,7 @@ export class SvgPath extends BaseSvg implements IsShape {
     }
 
     path(path: number[]): this {
-        this.svg.setAttribute("d", toPath(path));
+        this.innerSvg.setAttribute("d", toPath(path));
         return this;
     }
     is<T extends keyof SvgType>(type: T): this is SvgType[T] {

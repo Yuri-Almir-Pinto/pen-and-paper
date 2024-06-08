@@ -6,9 +6,9 @@ export type CommandOptions = {
 }
 
 export class BaseCommand {
-    type: CommandType = CommandType.BaseCommand
-    canUndo: boolean
-    temporary: boolean
+    readonly type: CommandType = CommandType.BaseCommand
+    readonly canUndo: boolean
+    readonly temporary: boolean
 
     constructor(options?: CommandOptions) {
         this.canUndo = options?.canUndo != null ? options.canUndo : false;
@@ -16,7 +16,6 @@ export class BaseCommand {
     }
 
     is<T extends keyof CommandMap>(type: T): this is CommandMap[T] {
-        console.error("Some Command class called the base Command 'is'. This should not happen.");
         return type === this.type;
     }
 }

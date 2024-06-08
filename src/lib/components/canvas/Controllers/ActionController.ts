@@ -2,19 +2,37 @@ import { ButtonState, WheelState, type CanvasActionDTO } from "../State/Types";
 import { type BaseCommand } from "../Commands/BaseCommand";
 import { ResizeMainSVG } from "../Commands/ImplementedCommands/ResizeMainSVG";
 import { Interaction } from "./Types";
+import { NewDrawing } from "../Commands/ImplementedCommands/NewDrawing";
+import { ProgressDrawing } from "../Commands/ImplementedCommands/ProgressDrawing";
 
 export function createCommands(state: CanvasActionDTO): BaseCommand[] {
     const commands: BaseCommand[] = [];
 
     moveCommand(state, commands);
     zoomCommand(state, commands);
+    newDrawingCommand(state, commands);
+    progressDrawingCommand(state, commands);
 
     return commands;
 }
 
-function zoomCommand(state: CanvasActionDTO, commands: BaseCommand[]): void {
-    const { keyboardData, mouseData, canvasData } = state;
+function progressDrawingCommand({ mouseData, canvasData }: CanvasActionDTO, commands: BaseCommand[]) {
+    if (canvasData.currentMode === Interaction.Move || mouseData.left === ButtonState.Pressed)
+        return;
 
+    const command = new ProgressDrawing(mouseData, canvasData, { temporary: mouseData.left === ButtonState.Held });
+    commands.push(command);
+}
+
+function newDrawingCommand({ mouseData, canvasData }: CanvasActionDTO, commands: BaseCommand[]) {
+    if (canvasData.currentMode === Interaction.Move || mouseData.left !== ButtonState.Pressed || canvasData.isDrawing === true)
+        return;
+
+    const command = new NewDrawing(mouseData, canvasData, { canUndo: true });
+    commands.push(command);
+}
+
+function zoomCommand({ keyboardData, mouseData, canvasData }: CanvasActionDTO, commands: BaseCommand[]): void {
     if (keyboardData.ctrlKey === false || mouseData.wheel == WheelState.None)
         return;
 
@@ -58,8 +76,7 @@ function moveCommand(state: CanvasActionDTO, commands: BaseCommand[]): void {
     }
 
     if (mouseData.left === ButtonState.Held && dataSet === true) {
-        const command = new ResizeMainSVG(newX!, newY!, canvasData.zoom);
-        command.temporary = true;
+        const command = new ResizeMainSVG(newX!, newY!, canvasData.zoom, { temporary: true });
         commands.push(command);
     }
 

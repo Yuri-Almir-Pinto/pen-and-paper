@@ -58,6 +58,7 @@ export interface CanvasStateDTO {
     readonly svgHeight: number
     readonly viewWidth: number
     readonly viewHeight: number
+    readonly isDrawing: boolean
     leftDistancePercentage(svgX: number): number
     topDistancePercentage(svgY: number): number
 }
