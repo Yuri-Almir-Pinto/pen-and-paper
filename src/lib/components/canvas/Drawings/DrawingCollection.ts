@@ -3,6 +3,7 @@ import type { BaseCommand } from "../Commands/BaseCommand";
 import type { NewDrawing } from "../Commands/ImplementedCommands/NewDrawing";
 import { CommandType, type Executable } from "../Commands/Types";
 import type { BaseDrawing } from "./BaseDrawing";
+import { Circle } from "./Shapes/Circle";
 import { Square } from "./Shapes/Square";
 import type { BaseSvg } from "./SvgTools/BaseSvg";
 import { DrawingType } from "./Types";
@@ -43,8 +44,7 @@ export class DrawingCollection implements Executable {
             case DrawingType.Square:
                 return Square.new(command);
             case DrawingType.Circle:
-                console.error("Not implemented");
-                return null!;
+                return Circle.new(command);
             case DrawingType.Path:
                 console.error("Not implemented");
                 return null!;

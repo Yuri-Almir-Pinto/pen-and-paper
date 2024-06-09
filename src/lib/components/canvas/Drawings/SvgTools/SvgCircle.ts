@@ -17,8 +17,8 @@ export class SvgCircle extends BaseSvg implements IsShape  {
         height = height/2;
         this.innerSvg.setAttribute("rx", Math.abs(width === 0 ? 1 : width).toString());
         this.innerSvg.setAttribute("ry", Math.abs(height === 0 ? 1 : height).toString());
-        const xPos = width > 0 ? cx + width : (cx + width) - width;
-        const yPos = height > 0 ? cy + height : (cy + height) - height;
+        const xPos = cx + width;
+        const yPos = cy + height;
         
         this.innerSvg.setAttribute("cx", xPos.toString());
         this.innerSvg.setAttribute("cy", yPos.toString());

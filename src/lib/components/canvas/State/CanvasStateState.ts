@@ -99,7 +99,7 @@ export default class CanvasState implements CanvasStateDTO {
     static default(svg: SVGElement): CanvasState {
         return new CanvasState(
             svg,
-            Interaction.DrawSquare,
+            Interaction.DrawCircle,
             "transparent",
             "black",
             2,

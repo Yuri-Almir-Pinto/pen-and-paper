@@ -1,22 +1,21 @@
-import type { BaseCommand } from "../../Commands/BaseCommand";
-import type { NewDrawingCanvasInfo, NewDrawingMouseInfo } from "../../Commands/ImplementedCommands/NewDrawing";
-import { CommandType } from "../../Commands/Types";
-import { BaseDrawing } from "../BaseDrawing";
-import { SvgSquare } from "../SvgTools/SvgSquare";
+import type { BaseCommand } from "../../Commands/BaseCommand"
+import type { NewDrawingCanvasInfo, NewDrawingMouseInfo } from "../../Commands/ImplementedCommands/NewDrawing"
+import { CommandType } from "../../Commands/Types"
+import { BaseDrawing } from "../BaseDrawing"
+import { SvgCircle } from "../SvgTools/SvgCircle"
 
-export class Square extends BaseDrawing<SvgSquare> {
+
+export class Circle extends BaseDrawing<SvgCircle> {
     private _originX!: number
     private _originY!: number
     private _width!: number
     private _height!: number
-    private _borderRadius!: number
 
     constructor() {
-        super(new SvgSquare());
+        super(new SvgCircle());
 
         this.setOrigin(0, 0);
         this.setSize(0, 0);
-        this.setBorderRadius(0);
     }
 
     execute(commands: BaseCommand[]) {
@@ -29,20 +28,22 @@ export class Square extends BaseDrawing<SvgSquare> {
                     const newHeight = command.svgY - command.prevSvgY;
                     if (command.temporary === true)
                         this.svg.size(newWidth, newHeight, this._originX, this._originY);
-                    else
+                    else {
+                        debugger;
                         this.setSize(newWidth, newHeight);
+                    }
+                        
                     break;
             }
         }
     }
 
-    static new(data: NewDrawingCanvasInfo & NewDrawingMouseInfo): Square {
-        const drawing = new Square();
+    static new(data: NewDrawingCanvasInfo & NewDrawingMouseInfo): Circle {
+        const drawing = new Circle();
         drawing.config(data);
 
         drawing.setOrigin(data.svgX, data.svgY);
         drawing.setSize(0, 0);
-        drawing.setBorderRadius(data.roundedCorners);
 
         return drawing;
     }
@@ -57,10 +58,5 @@ export class Square extends BaseDrawing<SvgSquare> {
         this._width = newWidth;
         this._height = newHeight;
         this.svg.size(this._width, this._height, this._originX, this._originY);
-    }
-
-    protected setBorderRadius(newBorderRadius: number) {
-        this._borderRadius = newBorderRadius;
-        this.svg.borderRadius(this._borderRadius);
     }
 }
