@@ -17,7 +17,7 @@
     - Desenhos básicos
 
 ### Bugs -
-- Ao clicar com o mouse, mover, e apertar espaço, a tela move instantaneamente para o mouse. O comportamento esperado é a tela apenas acompanahr
+- Ao clicar com o mouse, mover, e apertar espaço, a tela move instantaneamente para o mouse. O comportamento esperado é a tela apenas acompanhar.
 o movimento do mouse.
 
 ### Em progresso - On hold -

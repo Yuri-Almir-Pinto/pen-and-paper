@@ -9,7 +9,7 @@ export enum CommandType {
     ResizeMainSVG,
     ToggleMoveMainSVG,
     NewDrawing,
-    ProgressDrawingCreation,
+    ProgressDrawing,
 }
 
 export type CommandMap = {
@@ -17,7 +17,7 @@ export type CommandMap = {
     [CommandType.ResizeMainSVG]: ResizeMainSVG
     [CommandType.ToggleMoveMainSVG]: ToggleMoveMainSVG
     [CommandType.NewDrawing]: NewDrawing
-    [CommandType.ProgressDrawingCreation]: ProgressDrawing
+    [CommandType.ProgressDrawing]: ProgressDrawing
 }
 
 export interface Executable {

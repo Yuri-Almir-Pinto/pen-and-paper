@@ -1,14 +1,23 @@
 import { Interaction } from "../../Controllers/Types";
 import { DrawingType } from "../../Drawings/Types";
+import { ButtonState } from "../../State/Types";
 import { BaseCommand, type CommandOptions } from "../BaseCommand";
 import { CommandType } from "../Types";
 
-type ProgressDrawingCommandCanvasInfo = {
+type ProgressDrawingCommandCanvasArgument = {
     readonly currentMode: Interaction
     readonly fillColor: number | string
     readonly strokeColor: number | string
     readonly strokeWidth: number
     readonly roundedCorners: number
+}
+
+type ProgressDrawingCommandMouseArgument = {
+    readonly svgX: number
+    readonly svgY: number
+    readonly prevSvgX: number
+    readonly prevSvgY: number
+    readonly left: ButtonState
 }
 
 export type ProgressDrawingMouseInfo = {
@@ -27,12 +36,13 @@ export type ProgressDrawingCanvasInfo = {
 };
 
 export class ProgressDrawing extends BaseCommand implements ProgressDrawingMouseInfo, ProgressDrawingCanvasInfo {
-    readonly type: CommandType = CommandType.ProgressDrawingCreation;
+    readonly type: CommandType = CommandType.ProgressDrawing;
 
     readonly svgX: number
     readonly svgY: number
     readonly prevSvgX: number
     readonly prevSvgY: number
+    readonly isClick: boolean
 
     readonly currentMode!: DrawingType
     readonly fillColor: number | string
@@ -40,14 +50,14 @@ export class ProgressDrawing extends BaseCommand implements ProgressDrawingMouse
     readonly strokeWidth: number
     readonly roundedCorners: number
 
-    constructor(mouseData: ProgressDrawingMouseInfo, canvasData: ProgressDrawingCommandCanvasInfo, options?: CommandOptions) {
+    constructor(mouseData: ProgressDrawingCommandMouseArgument, canvasData: ProgressDrawingCommandCanvasArgument, options?: CommandOptions) {
         super(options);
 
         this.svgX = mouseData.svgX;
         this.svgY = mouseData.svgY;
         this.prevSvgX = mouseData.prevSvgX;
         this.prevSvgY = mouseData.prevSvgY;
-
+        this.isClick = mouseData.left === ButtonState.Pressed;
 
         switch(canvasData.currentMode) {
             case Interaction.DrawCircle:
@@ -66,6 +76,6 @@ export class ProgressDrawing extends BaseCommand implements ProgressDrawingMouse
         this.fillColor = canvasData.fillColor;
         this.strokeColor = canvasData.strokeColor;
         this.strokeWidth = canvasData.strokeWidth;
-        this.roundedCorners = canvasData.roundedCorners
+        this.roundedCorners = canvasData.roundedCorners;
     }
 }

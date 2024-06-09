@@ -4,6 +4,7 @@ import type { NewDrawing } from "../Commands/ImplementedCommands/NewDrawing";
 import { CommandType, type Executable } from "../Commands/Types";
 import type { BaseDrawing } from "./BaseDrawing";
 import { Circle } from "./Shapes/Circle";
+import { Path } from "./Shapes/Path";
 import { Square } from "./Shapes/Square";
 import type { BaseSvg } from "./SvgTools/BaseSvg";
 import { DrawingType } from "./Types";
@@ -24,7 +25,7 @@ export class DrawingCollection implements Executable {
                 case command.is(CommandType.NewDrawing):
                     this._addCurrentlyDrawing(this._newDrawing(command));
                     break;
-                case command.is(CommandType.ProgressDrawingCreation):
+                case command.is(CommandType.ProgressDrawing):
                     if (this.isDrawing === false)
                         break;
 
@@ -46,8 +47,7 @@ export class DrawingCollection implements Executable {
             case DrawingType.Circle:
                 return Circle.new(command);
             case DrawingType.Path:
-                console.error("Not implemented");
-                return null!;
+                return Path.new(command);
             default:
                 console.error("No new drawing was created in the 'newDrawing' method. This is an error.");
                 assertUnreachable(command.currentMode);

@@ -23,7 +23,7 @@ export class Circle extends BaseDrawing<SvgCircle> {
 
         for (let command of commands) {
             switch(true) {
-                case command.is(CommandType.ProgressDrawingCreation):
+                case command.is(CommandType.ProgressDrawing):
                     const newWidth = command.svgX - command.prevSvgX;
                     const newHeight = command.svgY - command.prevSvgY;
                     if (command.temporary === true)

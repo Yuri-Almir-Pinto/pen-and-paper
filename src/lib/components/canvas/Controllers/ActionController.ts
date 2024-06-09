@@ -16,12 +16,41 @@ export function createCommands(state: CanvasActionDTO): BaseCommand[] {
     return commands;
 }
 
-function progressDrawingCommand({ mouseData, canvasData }: CanvasActionDTO, commands: BaseCommand[]) {
-    if (canvasData.currentMode === Interaction.Move || mouseData.left === ButtonState.Pressed)
-        return;
-
-    const command = new ProgressDrawing(mouseData, canvasData, { temporary: mouseData.left === ButtonState.Held });
+function progressDrawingCommand({ keyboardData, mouseData, canvasData }: CanvasActionDTO, commands: BaseCommand[]) {
+    if (canvasData.isDrawing === false || canvasData.currentMode === Interaction.Move || mouseData.left === ButtonState.Released)
+        return
+    
+    const command = new ProgressDrawing(mouseData, canvasData, { temporary: leftMouseIsHeldOrModeIsDrawLine() });
     commands.push(command);
+
+    if (clickedWhileDrawingLine()) {
+        const command = new ProgressDrawing(mouseData, canvasData, { temporary: true });
+        commands.push(command);
+        return;
+    }
+
+    else if (pressedEscWhileDrawingLine()) {
+        const command = new ProgressDrawing(mouseData, canvasData);
+        commands.push(command);
+        return;
+    }
+
+    function leftMouseIsHeldOrModeIsDrawLine() {
+        return mouseData.left === ButtonState.Held 
+        || canvasData.currentMode === Interaction.DrawLine;
+    }
+
+    function clickedWhileDrawingLine() {
+        return canvasData.currentMode === Interaction.DrawLine 
+        && mouseData.left === ButtonState.Pressed 
+        && canvasData.isDrawing === true;
+    }
+
+    function pressedEscWhileDrawingLine() {
+        return canvasData.currentMode === Interaction.DrawLine 
+        && canvasData.isDrawing === true 
+        && keyboardData.keysPressed.get("Escape") === ButtonState.Pressed;
+    }
 }
 
 function newDrawingCommand({ mouseData, canvasData }: CanvasActionDTO, commands: BaseCommand[]) {

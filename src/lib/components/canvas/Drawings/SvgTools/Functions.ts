@@ -16,7 +16,5 @@ export function toPath(path: number[]): string {
             returnString += `${path[i]} `
     }
 
-    returnString += "Z";
-
     return returnString;
 }
