@@ -1,6 +1,6 @@
 import { type MouseButtons, ButtonState, WheelState, type MouseDTO, updateButtonState, updateWheelState } from "./Types"
 
-type RelevantMouseData = {timeStamp: number, shiftKey: boolean, altKey: boolean, layerX: number, 
+interface RelevantMouseData {timeStamp: number, shiftKey: boolean, altKey: boolean, layerX: number, 
     layerY: number, deltaY?: number, button: number, type: string }
 
 export default class MouseState implements MouseDTO {

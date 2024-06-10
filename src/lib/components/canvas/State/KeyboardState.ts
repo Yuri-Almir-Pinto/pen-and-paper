@@ -1,17 +1,17 @@
 import { readonly } from "svelte/store"
-import { ButtonState, updateButtonState, type KeyboardButtons, type KeyboardDTO } from "./Types"
+import { ButtonState, Key, updateButtonState, type KeyboardButtons, type KeyboardDTO } from "./Types"
 
-type RelevantKeyboardData = {timeStamp: number, shiftKey: boolean, altKey: boolean, ctrlKey: boolean, type: string, key: string}
+interface RelevantKeyboardData {timeStamp: number, shiftKey: boolean, altKey: boolean, ctrlKey: boolean, type: string, key: string}
 
 export default class KeyboardState implements KeyboardDTO {
-    keysPressed: KeyboardButtons
+    keysState: KeyboardButtons
     altKey: boolean
     shiftKey: boolean
     ctrlKey: boolean
     timeStamp: number
 
     constructor() {
-        this.keysPressed = new Map()
+        this.keysState = new Map()
         this.timeStamp = 0;
         this.shiftKey = false;
         this.altKey = false;
@@ -25,19 +25,19 @@ export default class KeyboardState implements KeyboardDTO {
         this.ctrlKey = event.ctrlKey;
 
         if (event.type === "keydown") {
-            this.keysPressed.set(event.key, ButtonState.Pressed);
+            this.keysState.set(event.key as Key, ButtonState.Pressed);
         }
         else if (event.type === "keyup") {
-            this.keysPressed.set(event.key, ButtonState.Released);
+            this.keysState.set(event.key as Key, ButtonState.Released);
         }
     }
 
     commit(): KeyboardDTO {
-        const frozenKeysPressed = Object.freeze(new Map([...this.keysPressed]));
-        const frozen = Object.freeze({ ...this, keysPressed: frozenKeysPressed });
+        const frozenKeysPressed = Object.freeze(new Map([...this.keysState]));
+        const frozen = Object.freeze({ ...this, keysState: frozenKeysPressed });
     
         return frozen;
     }
 
-    updateButtons() { this.keysPressed = updateButtonState(this.keysPressed) }
+    updateButtons() { this.keysState = updateButtonState(this.keysState) }
 }

@@ -8,7 +8,7 @@ export enum WheelState {
     None, Up, Down
 }
 
-type ButtonStateObject = Map<string, ButtonState>
+type ButtonStateObject = Map<Key, ButtonState>
 
 export function updateButtonState(state: ButtonState): ButtonState;
 export function updateButtonState(state: ButtonStateObject): ButtonStateObject;
@@ -37,7 +37,7 @@ export function updateWheelState(state: WheelState): WheelState {
     return WheelState.None
 }
 
-export type MouseButtons = {
+export interface MouseButtons {
     left: ButtonState
     right: ButtonState
     middle: ButtonState
@@ -64,11 +64,16 @@ export interface CanvasStateDTO {
 }
 
 export interface KeyboardDTO {
-    readonly keysPressed: ReadonlyMap<string, ButtonState>
+    readonly keysState: ReadonlyMap<Key, ButtonState>
     readonly altKey: boolean
     readonly shiftKey: boolean
     readonly ctrlKey: boolean
     readonly timeStamp: number
+}
+
+export enum Key {
+    Space = " ", 
+    Escape = "Escape"
 }
 
 export interface MouseDTO {
@@ -87,8 +92,13 @@ export interface MouseDTO {
     readonly timestamp: number
 }
 
+export interface CombinedDTO {
+    readonly keyPressedCords: ReadonlyMap<Key, { x: number, y: number }>
+}
+
 export interface CanvasActionDTO {
     readonly mouseData: MouseDTO
     readonly keyboardData: KeyboardDTO
     readonly canvasData: CanvasStateDTO
+    readonly combinedData: CombinedDTO
 }

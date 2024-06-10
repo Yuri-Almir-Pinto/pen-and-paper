@@ -1,6 +1,6 @@
-import { ButtonState, type CanvasActionDTO } from "../State/Types"
+import { ButtonState, Key, type CanvasActionDTO } from "../State/Types"
 import CanvasCommandData from "../State/CanvasCommandState"
-import CanvasState from "../State/CanvasStateState"
+import CanvasState from "../State/CanvasState"
 import KeyboardState from "../State/KeyboardState"
 import MouseState from "../State/MouseState"
 import { isKeyboardEvent, isMouseEvent, isWheelEvent, setAllEvents } from "../utils/EventFunctions"
@@ -9,18 +9,21 @@ import { BaseCommand } from "../Commands/BaseCommand"
 import { ToggleMoveMainSVG } from "../Commands/ImplementedCommands/ToggleMoveMainSVG"
 import { ResizeMainSVG } from "../Commands/ImplementedCommands/ResizeMainSVG"
 import { CommandType, type Executable } from "../Commands/Types"
+import CombinedState from "../State/CombinedState"
 
 export default class CanvasController implements Executable {
     private _app: SVGElement
     private _state: CanvasState
     private _keyboard: KeyboardState
     private _mouse: MouseState
+    private _combined: CombinedState
 
     constructor(app: SVGElement) {
         this._app = app;
         this._state = CanvasState.default(this._app);
         this._keyboard = new KeyboardState();
         this._mouse = new MouseState();
+        this._combined = new CombinedState();
 
         this._app.tabIndex = 1;
         this._setUIViewBox(this._state.viewX, this._state.viewY, this._state.zoom);
@@ -47,6 +50,7 @@ export default class CanvasController implements Executable {
             this._mouse,
             this._keyboard,
             this._state,
+            this._combined,
         )
     }
 
@@ -88,6 +92,7 @@ export default class CanvasController implements Executable {
                 break;
         }
         this._state.update(this._app);
+        this._combined.update(this._mouse, this._keyboard);
 
         this._updateInputState();
 
@@ -100,7 +105,7 @@ export default class CanvasController implements Executable {
     }
 
     private _updateInputState() {
-        const spaceState = this._keyboard.keysPressed.get(" ");
+        const spaceState = this._keyboard.keysState.get(Key.Space);
         switch(spaceState) {
             case ButtonState.Pressed:
                 this._toggleMove(true)

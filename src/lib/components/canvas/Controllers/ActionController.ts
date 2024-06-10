@@ -1,4 +1,4 @@
-import { ButtonState, WheelState, type CanvasActionDTO } from "../State/Types";
+import { ButtonState, Key, WheelState, type CanvasActionDTO } from "../State/Types";
 import { type BaseCommand } from "../Commands/BaseCommand";
 import { ResizeMainSVG } from "../Commands/ImplementedCommands/ResizeMainSVG";
 import { Interaction } from "./Types";
@@ -49,7 +49,7 @@ function progressDrawingCommand({ keyboardData, mouseData, canvasData }: CanvasA
     function pressedEscWhileDrawingLine() {
         return canvasData.currentMode === Interaction.DrawLine 
         && canvasData.isDrawing === true 
-        && keyboardData.keysPressed.get("Escape") === ButtonState.Pressed;
+        && keyboardData.keysState.get(Key.Escape) === ButtonState.Pressed;
     }
 }
 
@@ -91,26 +91,31 @@ function zoomCommand({ keyboardData, mouseData, canvasData }: CanvasActionDTO, c
     commands.push(command);
 }
 
-function moveCommand(state: CanvasActionDTO, commands: BaseCommand[]): void {
-    const { canvasData, mouseData, keyboardData } = state;
-    const spaceState = keyboardData.keysPressed.get(" ");
+function moveCommand({ keyboardData, mouseData, canvasData, combinedData }: CanvasActionDTO, commands: BaseCommand[]): void {
+    if (canvasData.currentMode !== Interaction.Move)
+        return;
+    
+    const spaceState = keyboardData.keysState.get(Key.Space);
     let newX: number;
     let newY: number;
-    let dataSet: boolean = false;
 
-    if (canvasData.currentMode === Interaction.Move || spaceState === ButtonState.Pressed || spaceState === ButtonState.Held) {
+    if (spaceState === ButtonState.Pressed || spaceState === ButtonState.Held) {
+        const spacePressCoords = combinedData.keyPressedCords.get(Key.Space);
+        if (spacePressCoords == null) {
+            console.error("spacePressCoords was null when it shouldn't.");
+            return;
+        }
+
+        newX = (spacePressCoords.x - mouseData.svgX) + canvasData.viewX;
+        newY = (spacePressCoords.y - mouseData.svgY) + canvasData.viewY;
+    }
+    else if (mouseData.left === ButtonState.Held) {
         newX = (mouseData.prevSvgX - mouseData.svgX) + canvasData.viewX;
         newY = (mouseData.prevSvgY - mouseData.svgY) + canvasData.viewY;
-        dataSet = true;
     }
-
-    if (mouseData.left === ButtonState.Held && dataSet === true) {
-        const command = new ResizeMainSVG(newX!, newY!, canvasData.zoom, { temporary: true });
-        commands.push(command);
-    }
-
-    if (mouseData.left === ButtonState.Released && dataSet === true) {
-        const command = new ResizeMainSVG(newX!, newY!, canvasData.zoom);
-        commands.push(command);
-    }
+    else
+        return;
+    
+    const command = new ResizeMainSVG(newX, newY, canvasData.zoom);
+    commands.push(command);
 }
