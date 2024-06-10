@@ -28,6 +28,7 @@ export default class CanvasController implements Executable {
         this._app.tabIndex = 1;
         this._setUIViewBox(this._state.viewX, this._state.viewY, this._state.zoom);
         setAllEvents(this._onAction, this._app, this);
+        window.addEventListener("resize", () => this._setUIViewBox());
     }
 
     execute(commands: BaseCommand[]): void {
@@ -71,7 +72,7 @@ export default class CanvasController implements Executable {
         this._setUIViewBox(command.viewX, command.viewY, command.zoom);
     }
 
-    private _setUIViewBox(viewX: number, viewY: number, zoom: number) {
+    private _setUIViewBox(viewX: number = this._state.viewX, viewY: number = this._state.viewY, zoom: number = this._state.zoom) {
         const containerWidth = this._app.parentElement?.clientWidth as number;
         const containerHeight = this._app.parentElement?.clientHeight as number;
         
