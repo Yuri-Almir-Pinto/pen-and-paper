@@ -68,7 +68,6 @@ export interface KeyboardDTO {
     readonly altKey: boolean
     readonly shiftKey: boolean
     readonly ctrlKey: boolean
-    readonly timeStamp: number
 }
 
 export enum Key {
@@ -87,9 +86,7 @@ export interface MouseDTO {
     readonly svgY: number
     readonly prevSvgX: number
     readonly prevSvgY: number
-    readonly altPressed: boolean
-    readonly shiftPressed: boolean
-    readonly timestamp: number
+    readonly isLeftClick: boolean
 }
 
 export interface CombinedDTO {

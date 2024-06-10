@@ -1,4 +1,4 @@
-import { toColor } from "./Functions";
+import { toColor } from "../Functions";
 import type { IsShape, SvgType } from "./Types";
 
 const ns: "http://www.w3.org/2000/svg" = "http://www.w3.org/2000/svg";

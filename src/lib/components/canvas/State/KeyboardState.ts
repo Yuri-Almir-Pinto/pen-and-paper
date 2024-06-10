@@ -1,25 +1,22 @@
 import { readonly } from "svelte/store"
 import { ButtonState, Key, updateButtonState, type KeyboardButtons, type KeyboardDTO } from "./Types"
 
-interface RelevantKeyboardData {timeStamp: number, shiftKey: boolean, altKey: boolean, ctrlKey: boolean, type: string, key: string}
+interface RelevantKeyboardData {shiftKey: boolean, altKey: boolean, ctrlKey: boolean, type: string, key: string}
 
 export default class KeyboardState implements KeyboardDTO {
     keysState: KeyboardButtons
     altKey: boolean
     shiftKey: boolean
     ctrlKey: boolean
-    timeStamp: number
 
     constructor() {
         this.keysState = new Map()
-        this.timeStamp = 0;
         this.shiftKey = false;
         this.altKey = false;
         this.ctrlKey = false;
     }
 
     update(event: RelevantKeyboardData) {
-        this.timeStamp = event.timeStamp;
         this.shiftKey = event.shiftKey;
         this.altKey = event.altKey;
         this.ctrlKey = event.ctrlKey;

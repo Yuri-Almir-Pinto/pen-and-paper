@@ -2,7 +2,7 @@ import type { BaseCommand } from "../Commands/BaseCommand";
 import type { NewDrawingCanvasInfo, NewDrawingMouseInfo } from "../Commands/ImplementedCommands/NewDrawing";
 import type { Executable } from "../Commands/Types";
 import type { BaseSvg } from "./SvgTools/BaseSvg";
-import { toColor } from "./SvgTools/Functions";
+import { toColor } from "./Functions";
 
 export class BaseDrawing<TSVG extends BaseSvg> implements Executable {
     svg: TSVG

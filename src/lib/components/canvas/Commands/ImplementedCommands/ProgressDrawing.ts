@@ -18,6 +18,7 @@ type ProgressDrawingCommandMouseArgument = {
     readonly prevSvgX: number
     readonly prevSvgY: number
     readonly left: ButtonState
+    readonly isLeftClick: boolean
 }
 
 export type ProgressDrawingMouseInfo = {
@@ -42,7 +43,7 @@ export class ProgressDrawing extends BaseCommand implements ProgressDrawingMouse
     readonly svgY: number
     readonly prevSvgX: number
     readonly prevSvgY: number
-    readonly isClick: boolean
+    readonly isLeftClick: boolean
 
     readonly currentMode!: DrawingType
     readonly fillColor: number | string
@@ -50,20 +51,22 @@ export class ProgressDrawing extends BaseCommand implements ProgressDrawingMouse
     readonly strokeWidth: number
     readonly roundedCorners: number
 
-    constructor(mouseData: ProgressDrawingCommandMouseArgument, canvasData: ProgressDrawingCommandCanvasArgument, options?: CommandOptions) {
+    constructor(mouseData: ProgressDrawingCommandMouseArgument, 
+        canvasData: ProgressDrawingCommandCanvasArgument, 
+        options?: CommandOptions) {
         super(options);
 
         this.svgX = mouseData.svgX;
         this.svgY = mouseData.svgY;
         this.prevSvgX = mouseData.prevSvgX;
         this.prevSvgY = mouseData.prevSvgY;
-        this.isClick = mouseData.left === ButtonState.Pressed;
+        this.isLeftClick = mouseData.isLeftClick;
 
         switch(canvasData.currentMode) {
             case Interaction.DrawCircle:
                 this.currentMode = DrawingType.Circle;
                 break;
-            case Interaction.DrawLine:
+            case Interaction.DrawPath:
                 this.currentMode = DrawingType.Path;
                 break;
             case Interaction.DrawSquare:

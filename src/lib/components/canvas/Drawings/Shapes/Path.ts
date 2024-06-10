@@ -20,9 +20,9 @@ export class Path extends BaseDrawing<SvgPath> {
         for (let command of commands) {
             switch(true) {
                 case command.is(CommandType.ProgressDrawing):
-                    if (command.temporary === true && command.isClick === false)
+                    if (command.temporary === true && command.isLeftClick === false)
                         this.svg.path([...this._path, command.svgX, command.svgY]);
-                    else if (command.temporary === false || command.isClick === true)
+                    else if (command.temporary === false || command.isLeftClick === true)
                         this.setPath([...this._path, command.svgX, command.svgY]);
                     break;
             }

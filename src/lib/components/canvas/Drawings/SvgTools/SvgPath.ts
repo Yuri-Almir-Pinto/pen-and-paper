@@ -1,5 +1,5 @@
 import { BaseSvg } from "./BaseSvg";
-import { toPath } from "./Functions";
+import { toPath } from "../Functions";
 import type { SvgType, IsShape } from "./Types";
 
 export class SvgPath extends BaseSvg implements IsShape {

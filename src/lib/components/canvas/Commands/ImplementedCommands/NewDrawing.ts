@@ -46,7 +46,7 @@ export class NewDrawing extends BaseCommand implements NewDrawingMouseInfo, NewD
             case Interaction.DrawCircle:
                 this.currentMode = DrawingType.Circle;
                 break;
-            case Interaction.DrawLine:
+            case Interaction.DrawPath:
                 this.currentMode = DrawingType.Path;
                 break;
             case Interaction.DrawSquare:

@@ -15,7 +15,6 @@
 - Implementar o desenho de linha por arraste.
 
 ### Bugs -
-- Ao clicar com o mouse, mover, e apertar espaço, a tela move instantaneamente para o mouse. O comportamento esperado é a tela apenas acompanhar o movimento do mouse.
 - "Path" sendo criado multiplas vezes no mesmo lugar.
 
 ### Em progresso - On hold -

@@ -1,6 +1,6 @@
 import { type MouseButtons, ButtonState, WheelState, type MouseDTO, updateButtonState, updateWheelState } from "./Types"
 
-interface RelevantMouseData {timeStamp: number, shiftKey: boolean, altKey: boolean, layerX: number, 
+interface RelevantMouseData {layerX: number, 
     layerY: number, deltaY?: number, button: number, type: string }
 
 export default class MouseState implements MouseDTO {
@@ -14,36 +14,33 @@ export default class MouseState implements MouseDTO {
     svgY: number
     prevSvgX: number
     prevSvgY: number
-    altPressed: boolean
-    shiftPressed: boolean
-    timestamp: number
     moved: boolean
+    isLeftClick: boolean
 
     constructor() {
-        this.timestamp = 0;
         this.layerX = 0;
         this.layerY = 0;
         this.svgX = 0;
         this.svgY = 0;
         this.prevSvgX = 0;
         this.prevSvgY = 0;
-        this.altPressed = false;
-        this.shiftPressed = false;
         this.wheel = WheelState.None
         this.left = ButtonState.None;
         this.right = ButtonState.None;
         this.middle = ButtonState.None;
         this.moved = false;
+        this.isLeftClick = false;
     }
 
     update(event: RelevantMouseData, zoom: number, viewX: number, viewY: number) {
-        this.timestamp = event.timeStamp;
         this.layerX = event.layerX;
         this.layerY = event.layerY;
         this.svgX = ((event.layerX * zoom) + viewX);
         this.svgY = ((event.layerY * zoom) + viewY);
-        this.altPressed = event.altKey;
-        this.shiftPressed = event.shiftKey;
+
+        const eucledianDistance = Math.sqrt(((this.svgX - this.prevSvgX)^2 + (this.svgY - this.prevSvgY)^2));
+
+        this.isLeftClick = event.type === "mouseup" && eucledianDistance < 5;
 
         if (event.type === "mousedown") {
             this.prevSvgX = this.svgX;

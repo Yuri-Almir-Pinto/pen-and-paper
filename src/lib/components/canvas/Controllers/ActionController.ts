@@ -17,39 +17,40 @@ export function createCommands(state: CanvasActionDTO): BaseCommand[] {
 }
 
 function progressDrawingCommand({ keyboardData, mouseData, canvasData }: CanvasActionDTO, commands: BaseCommand[]) {
-    if (canvasData.isDrawing === false || canvasData.currentMode === Interaction.Move || mouseData.left === ButtonState.Released)
+    if (canvasData.isDrawing === false || canvasData.currentMode === Interaction.Move)
         return
     
     const command = new ProgressDrawing(mouseData, canvasData, { temporary: leftMouseIsHeldOrModeIsDrawLine() });
     commands.push(command);
 
-    if (clickedWhileDrawingLine()) {
-        const command = new ProgressDrawing(mouseData, canvasData, { temporary: true });
-        commands.push(command);
-        return;
-    }
-
-    else if (pressedEscWhileDrawingLine()) {
+    
+    if (finishedDrawingLineByDragging()) {
         const command = new ProgressDrawing(mouseData, canvasData);
+        commands.pop();
         commands.push(command);
-        return;
+    }
+    
+    if (pressedEscWhileDrawingLine()) {
+        const command = new ProgressDrawing(mouseData, canvasData);
+        commands.pop();
+        commands.push(command);
     }
 
     function leftMouseIsHeldOrModeIsDrawLine() {
         return mouseData.left === ButtonState.Held 
-        || canvasData.currentMode === Interaction.DrawLine;
-    }
-
-    function clickedWhileDrawingLine() {
-        return canvasData.currentMode === Interaction.DrawLine 
-        && mouseData.left === ButtonState.Pressed 
-        && canvasData.isDrawing === true;
+        || canvasData.currentMode === Interaction.DrawPath;
     }
 
     function pressedEscWhileDrawingLine() {
-        return canvasData.currentMode === Interaction.DrawLine 
+        return canvasData.currentMode === Interaction.DrawPath 
         && canvasData.isDrawing === true 
         && keyboardData.keysState.get(Key.Escape) === ButtonState.Pressed;
+    }
+
+    function finishedDrawingLineByDragging() {
+        return canvasData.currentMode === Interaction.DrawPath
+        && mouseData.isLeftClick === false
+        && mouseData.left === ButtonState.Released
     }
 }
 
