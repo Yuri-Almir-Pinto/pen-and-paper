@@ -4,6 +4,7 @@ import { ResizeMainSVG } from "../Commands/ImplementedCommands/ResizeMainSVG";
 import { Interaction } from "./Types";
 import { NewDrawing } from "../Commands/ImplementedCommands/NewDrawing";
 import { ProgressDrawing } from "../Commands/ImplementedCommands/ProgressDrawing";
+import { TestDraw100 } from "../Commands/ImplementedCommands/TestDraw100";
 
 export function createCommands(state: CanvasActionDTO): BaseCommand[] {
     const commands: BaseCommand[] = [];
@@ -12,12 +13,17 @@ export function createCommands(state: CanvasActionDTO): BaseCommand[] {
     zoomCommand(state, commands);
     newDrawingCommand(state, commands);
     progressDrawingCommand(state, commands);
+    
+    testKeyBindCommands(state, commands);
+
+    if (state.canvasData.currentMode === Interaction.Interact && state.mouseData.left === ButtonState.Pressed)
+        console.log(state.mouseData.target);
 
     return commands;
 }
 
 function progressDrawingCommand({ keyboardData, mouseData, canvasData }: CanvasActionDTO, commands: BaseCommand[]) {
-    if (canvasData.isDrawing === false || canvasData.currentMode === Interaction.Move)
+    if (canvasData.isDrawing === false || !isInteractionSomeShape(canvasData.currentMode))
         return
     
     const command = new ProgressDrawing(mouseData, canvasData, { temporary: leftMouseIsHeldOrModeIsDrawLine() });
@@ -55,7 +61,7 @@ function progressDrawingCommand({ keyboardData, mouseData, canvasData }: CanvasA
 }
 
 function newDrawingCommand({ mouseData, canvasData }: CanvasActionDTO, commands: BaseCommand[]) {
-    if (canvasData.currentMode === Interaction.Move || mouseData.left !== ButtonState.Pressed || canvasData.isDrawing === true)
+    if (!isInteractionSomeShape(canvasData.currentMode) || mouseData.left !== ButtonState.Pressed || canvasData.isDrawing === true)
         return;
 
     const command = new NewDrawing(mouseData, canvasData, { canUndo: true });
@@ -120,3 +126,19 @@ function moveCommand({ keyboardData, mouseData, canvasData, combinedData }: Canv
     const command = new ResizeMainSVG(newX, newY, canvasData.zoom);
     commands.push(command);
 }
+
+function testKeyBindCommands({ keyboardData }: CanvasActionDTO, commands: BaseCommand[]) {
+    const keyN = keyboardData.keysState.get(Key.KeyN);
+
+    if (keyN === ButtonState.Pressed) {
+        const command = new TestDraw100();
+        commands.push(command);
+    }
+}
+
+
+function isInteractionSomeShape(int: Interaction) {
+    return int === Interaction.DrawCircle || int === Interaction.DrawPath || int === Interaction.DrawSquare
+}
+
+

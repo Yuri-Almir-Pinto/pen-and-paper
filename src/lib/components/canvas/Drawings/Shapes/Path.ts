@@ -3,6 +3,7 @@ import type { NewDrawingCanvasInfo, NewDrawingMouseInfo } from "../../Commands/I
 import { CommandType } from "../../Commands/Types"
 import { BaseDrawing } from "../BaseDrawing"
 import { SvgPath } from "../SvgTools/SvgPath"
+import type { SelectSvgBoxRect } from "../SvgTools/Types"
 
 
 export class Path extends BaseDrawing<SvgPath> {
@@ -20,10 +21,9 @@ export class Path extends BaseDrawing<SvgPath> {
         for (let command of commands) {
             switch(true) {
                 case command.is(CommandType.ProgressDrawing):
-                    if (command.temporary === true && command.isLeftClick === false)
-                        this.svg.path([...this._path, command.svgX, command.svgY]);
-                    else if (command.temporary === false || command.isLeftClick === true)
-                        this.setPath([...this._path, command.svgX, command.svgY]);
+                    this.setPath([...this._path, command.svgX, command.svgY], { 
+                        temporary: !(command.temporary === false || command.isLeftClick === true) 
+                    });
                     break;
             }
         }
@@ -38,8 +38,15 @@ export class Path extends BaseDrawing<SvgPath> {
         return drawing;
     }
 
-    protected setPath(newPath: number[]) {
-        this._path = newPath;
-        this.svg.path(this._path);
+    setPath(newPath: number[], options: { temporary?: boolean } = { temporary: false }) {
+        if (options.temporary === false) {
+            this._path = newPath;
+        }
+        
+        this.svg.path(newPath);
+    }
+
+    protected getBoundingBox(): SelectSvgBoxRect {
+        throw new Error("Method not implemented.")
     }
 }

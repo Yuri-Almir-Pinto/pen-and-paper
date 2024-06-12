@@ -1,10 +1,10 @@
 import type { BaseCommand } from "../Commands/BaseCommand";
-import type { NewDrawingCanvasInfo, NewDrawingMouseInfo } from "../Commands/ImplementedCommands/NewDrawing";
-import type { Executable } from "../Commands/Types";
+import type { NewDrawingCanvasInfo } from "../Commands/ImplementedCommands/NewDrawing";
 import type { BaseSvg } from "./SvgTools/BaseSvg";
 import { toColor } from "./Functions";
+import type { SelectSvgBoxRect } from "./SvgTools/Types";
 
-export class BaseDrawing<TSVG extends BaseSvg> implements Executable {
+export abstract class BaseDrawing<TSVG extends BaseSvg> {
     svg: TSVG
     private _scaleX: number
     private _scaleY: number
@@ -16,7 +16,7 @@ export class BaseDrawing<TSVG extends BaseSvg> implements Executable {
         this.svg = svg;
         this._scaleX = 1;
         this._scaleY = 1;
-        this._fillColor = "transparent";
+        this._fillColor = "none";
         this._strokeColor = "black";
         this._strokeWidth = 2;
 
@@ -24,10 +24,32 @@ export class BaseDrawing<TSVG extends BaseSvg> implements Executable {
         this.svg.fillColor(this._fillColor);
         this.svg.strokeColor(this._strokeColor);
         this.svg.strokeWidth(this._strokeWidth);
+        this.svg.setOriginDrawing(this);
     }
 
     execute(commands: BaseCommand[]): void {
         return
+    }
+
+    setScale(newScaleX: number, newScaleY: number) {
+        this._scaleX = newScaleX;
+        this._scaleY = newScaleY;
+        this.svg.scale(this._scaleX, this._scaleY);
+    }
+
+    setFillColor(newFillColor: string | number) {
+        this._fillColor = toColor(newFillColor);
+        this.svg.fillColor(this._fillColor);
+    }
+
+    setStrokeColor(newStrokeColor: string | number) {
+        this._strokeColor = toColor(newStrokeColor);
+        this.svg.strokeColor(this._strokeColor);
+    }
+
+    setStrokeWidth(newStrokeWidth: number) {
+        this._strokeWidth = newStrokeWidth;
+        this.svg.strokeWidth(this._strokeWidth);
     }
 
     protected config(canvas: NewDrawingCanvasInfo) {
@@ -36,26 +58,7 @@ export class BaseDrawing<TSVG extends BaseSvg> implements Executable {
         this.setStrokeWidth(canvas.strokeWidth);
     }
 
-    protected setScale(newScaleX: number, newScaleY: number) {
-        this._scaleX = newScaleX;
-        this._scaleY = newScaleY;
-        this.svg.scale(this._scaleX, this._scaleY);
-    }
-
-    protected setFillColor(newFillColor: string | number) {
-        this._fillColor = toColor(newFillColor);
-        this.svg.fillColor(this._fillColor);
-    }
-
-    protected setStrokeColor(newStrokeColor: string | number) {
-        this._strokeColor = toColor(newStrokeColor);
-        this.svg.strokeColor(this._strokeColor);
-    }
-
-    protected setStrokeWidth(newStrokeWidth: number) {
-        this._strokeWidth = newStrokeWidth;
-        this.svg.strokeWidth(this._strokeWidth);
-    }
+    protected abstract getBoundingBox(): SelectSvgBoxRect
 
     protected get scaleX() { return this._scaleX; }
     protected get scaleY() { return this._scaleY; }

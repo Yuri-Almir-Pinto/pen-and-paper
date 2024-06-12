@@ -1,7 +1,7 @@
 import { assertUnreachable } from "../../utils/general";
 import type { BaseCommand } from "../Commands/BaseCommand";
 import type { NewDrawing } from "../Commands/ImplementedCommands/NewDrawing";
-import { CommandType, type Executable } from "../Commands/Types";
+import { CommandType } from "../Commands/Types";
 import type { BaseDrawing } from "./BaseDrawing";
 import { Circle } from "./Shapes/Circle";
 import { Path } from "./Shapes/Path";
@@ -9,7 +9,7 @@ import { Square } from "./Shapes/Square";
 import type { BaseSvg } from "./SvgTools/BaseSvg";
 import { DrawingType } from "./Types";
 
-export class DrawingCollection implements Executable {
+export class DrawingCollection {
     private _actions: BaseDrawing<BaseSvg>[]
     private _app: SVGElement
     private _currentlyDrawing?: BaseDrawing<BaseSvg>
@@ -35,6 +35,17 @@ export class DrawingCollection implements Executable {
                     }
                     else
                         this._currentlyDrawing?.execute([command]);
+                    break;
+                case command.is(CommandType.TestDraw100):
+                    for (let i = 0; i < 20; i++) {
+                        const drawing = new Path();
+
+                        drawing.setPath([Math.random() * 800, Math.random() * 800, Math.random() * 200, Math.random() * 200]);
+                        drawing.setScale(3, 1)
+
+                        this._addCurrentlyDrawing(drawing);
+                        this._commitCurrentlyDrawing();
+                    }
                     break;
             }
         }
@@ -66,7 +77,7 @@ export class DrawingCollection implements Executable {
         if (this.isDrawing === true)
             return;
 
-        this._app.appendChild(drawing.svg.innerSvg);
+        drawing.svg.appendTo(this._app);
         this._currentlyDrawing = drawing;
     }
 

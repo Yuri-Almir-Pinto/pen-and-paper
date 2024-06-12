@@ -1,38 +1,69 @@
+import { type SelectSvgBoxRect, type SvgTypeMap } from "./Types";
+import type { BaseDrawing } from "../BaseDrawing";
 import { toColor } from "../Functions";
-import type { IsShape, SvgType } from "./Types";
+import { SvgType, type IsShape } from "./Types";
+import { SelectSvg } from "./SelectSvg";
 
-const ns: "http://www.w3.org/2000/svg" = "http://www.w3.org/2000/svg";
+export const ns: "http://www.w3.org/2000/svg" = "http://www.w3.org/2000/svg";
 
+export abstract class BaseSvg implements IsShape {
+    type: SvgType = SvgType.Base
 
-export class BaseSvg implements IsShape {
-    innerSvg: SVGElement
+    protected innerSvg: SVGElement
+    protected wrapperSvg: SVGElement
 
     protected constructor(svgType: "rect" | "ellipse" | "path" | SVGElement) {
         if (typeof svgType === "string")
             this.innerSvg = document.createElementNS(ns, svgType);
         else
             this.innerSvg = svgType;
+
+        this.innerSvg.PNP = {
+            originDrawing: undefined
+        }
+
+        this.wrapperSvg = document.createElementNS(ns, "g");
+        this.wrapperSvg.appendChild(this.innerSvg);
     }
-    
+
+    getOriginDrawing(): BaseDrawing<BaseSvg> {
+        return this.innerSvg.PNP?.originDrawing!;
+    }
+
+    setOriginDrawing(originDrawing: BaseDrawing<BaseSvg>): void {
+        this.innerSvg.PNP.originDrawing = originDrawing;
+    }
+
     scale(scaleX: number, scaleY: number): this {
-        this.innerSvg.setAttribute("transform", `scale(${scaleX}, ${scaleY})`);
+        this.setAttribute("transform", `scale(${scaleX}, ${scaleY})`);
         return this;
     }
+
     fillColor(fillColor: string | number): this {
-        this.innerSvg.setAttribute("fill", toColor(fillColor));
+        this.setAttribute("fill", toColor(fillColor));
         return this;
     }
+
     strokeColor(strokeColor: string | number): this {
-        this.innerSvg.setAttribute("stroke", toColor(strokeColor));
+        this.setAttribute("stroke", toColor(strokeColor));
         return this;
     }
+
     strokeWidth(strokeWidth: number): this {
-        this.innerSvg.setAttribute("stroke-width", strokeWidth.toString());
+        this.setAttribute("stroke-width", strokeWidth.toString());
         return this;
     }
-    is<T extends keyof SvgType>(type: T): this is SvgType[T] {
-        console.error("Some SVG class called the base SVG 'is'. This should not happen.");
-        return type === "never"
+
+    appendTo(element: Element) {
+        element.appendChild(this.wrapperSvg);
+    }
+
+    is<T extends keyof SvgTypeMap>(type: T): this is SvgTypeMap[T] {
+        return type === this.type
+    }
+
+    protected setAttribute(attribute: string, value: string): void {
+        this.innerSvg.setAttribute(attribute, value);
     }
 }
 

@@ -12,12 +12,12 @@
 - Consertar loop infinito ao clicar em tecla
 
 ### Em progresso -
+- Função de seleção de forma
+- Função de edição de forma
 - Função de seleção com arraste do mouse
-- Função de edição de formas
 
 ### Bugs -
 - "Path" sendo criado multiplas vezes no mesmo lugar.
-- View do SVG desincronizando quando o usuário escolhe uma resolução diferente.
 
 
 

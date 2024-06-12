@@ -22,10 +22,10 @@ export default class KeyboardState implements KeyboardDTO {
         this.ctrlKey = event.ctrlKey;
 
         if (event.type === "keydown") {
-            this.keysState.set(event.key as Key, ButtonState.Pressed);
+            this.keysState.set(event.key.toUpperCase() as Key, ButtonState.Pressed);
         }
         else if (event.type === "keyup") {
-            this.keysState.set(event.key as Key, ButtonState.Released);
+            this.keysState.set(event.key.toUpperCase() as Key, ButtonState.Released);
         }
     }
 

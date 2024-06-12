@@ -1,3 +1,3 @@
 export enum Interaction {
-    Move, DrawPath, DrawSquare, DrawCircle
+    Move, Interact, DrawPath, DrawSquare, DrawCircle
 }

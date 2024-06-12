@@ -1,7 +1,8 @@
-import { type MouseButtons, ButtonState, WheelState, type MouseDTO, updateButtonState, updateWheelState } from "./Types"
+import type { BaseDrawing } from "../Drawings/BaseDrawing"
+import type { BaseSvg } from "../Drawings/SvgTools/BaseSvg"
+import { ButtonState, WheelState, type MouseDTO, updateButtonState, updateWheelState } from "./Types"
 
-interface RelevantMouseData {layerX: number, 
-    layerY: number, deltaY?: number, button: number, type: string }
+interface RelevantMouseData {layerX: number, layerY: number, deltaY?: number, button: number, type: string, target: EventTarget | null }
 
 export default class MouseState implements MouseDTO {
     left: ButtonState
@@ -16,6 +17,7 @@ export default class MouseState implements MouseDTO {
     prevSvgY: number
     moved: boolean
     isLeftClick: boolean
+    target?: Readonly<BaseDrawing<BaseSvg>>
 
     constructor() {
         this.layerX = 0;
@@ -30,15 +32,44 @@ export default class MouseState implements MouseDTO {
         this.middle = ButtonState.None;
         this.moved = false;
         this.isLeftClick = false;
+        this.target = undefined;
     }
 
     update(event: RelevantMouseData, zoom: number, viewX: number, viewY: number) {
         this.layerX = event.layerX;
         this.layerY = event.layerY;
-        this.svgX = ((event.layerX * zoom) + viewX);
-        this.svgY = ((event.layerY * zoom) + viewY);
+        this.svgX = (event.layerX * zoom) + viewX;
+        this.svgY = (event.layerY * zoom) + viewY;
+        
+        if (event.target instanceof SVGElement) {
+            let current = event.target;
+            while (true) {
+                if (current.PNP?.originDrawing != undefined) {
+                    this.target = current.PNP.originDrawing;
+                    break;
+                }
+                else {
+                    const parent = current.parentElement;
 
-        const eucledianDistance = Math.sqrt(((this.svgX - this.prevSvgX)^2 + (this.svgY - this.prevSvgY)^2));
+                    if (parent == null || parent.getAttribute("name") === "canvasOriginSvg") {
+                        this.target = undefined;
+                        break;
+                    }
+                        
+
+                    if (!(parent instanceof SVGElement)) {
+                        this.target = undefined;
+                        break;
+                    }
+
+                    current = parent;
+                }
+            }
+        }
+        else
+            this.target = undefined;
+
+        const eucledianDistance = Math.sqrt((this.svgX - this.prevSvgX)^2 + (this.svgY - this.prevSvgY)^2);
 
         this.isLeftClick = event.type === "mouseup" && eucledianDistance < 5;
 

@@ -3,6 +3,7 @@ import type { ToggleMoveMainSVG } from "./ImplementedCommands/ToggleMoveMainSVG"
 import type { ResizeMainSVG } from "./ImplementedCommands/ResizeMainSVG";
 import type { NewDrawing } from "./ImplementedCommands/NewDrawing";
 import type { ProgressDrawing } from "./ImplementedCommands/ProgressDrawing";
+import type { TestDraw100 } from "./ImplementedCommands/TestDraw100";
 
 export enum CommandType {
     BaseCommand,
@@ -10,6 +11,7 @@ export enum CommandType {
     ToggleMoveMainSVG,
     NewDrawing,
     ProgressDrawing,
+    TestDraw100
 }
 
 export type CommandMap = {
@@ -18,8 +20,5 @@ export type CommandMap = {
     [CommandType.ToggleMoveMainSVG]: ToggleMoveMainSVG
     [CommandType.NewDrawing]: NewDrawing
     [CommandType.ProgressDrawing]: ProgressDrawing
-}
-
-export interface Executable {
-    execute(commands: BaseCommand[]): void
+    [CommandType.TestDraw100]: TestDraw100
 }

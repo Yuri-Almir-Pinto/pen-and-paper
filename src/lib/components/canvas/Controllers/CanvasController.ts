@@ -8,10 +8,10 @@ import { createCommands } from "./ActionController"
 import { BaseCommand } from "../Commands/BaseCommand"
 import { ToggleMoveMainSVG } from "../Commands/ImplementedCommands/ToggleMoveMainSVG"
 import { ResizeMainSVG } from "../Commands/ImplementedCommands/ResizeMainSVG"
-import { CommandType, type Executable } from "../Commands/Types"
+import { CommandType } from "../Commands/Types"
 import CombinedState from "../State/CombinedState"
 
-export default class CanvasController implements Executable {
+export default class CanvasController {
     private _app: SVGElement
     private _state: CanvasState
     private _keyboard: KeyboardState

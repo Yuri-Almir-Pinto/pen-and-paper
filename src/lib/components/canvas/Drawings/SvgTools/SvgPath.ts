@@ -1,18 +1,18 @@
 import { BaseSvg } from "./BaseSvg";
 import { toPath } from "../Functions";
-import type { SvgType, IsShape } from "./Types";
+import { type IsShape, SvgType } from "./Types";
 
 export class SvgPath extends BaseSvg implements IsShape {
+    type: SvgType = SvgType.Path
+    
     constructor() {
         super("path");
-        this.fillColor("transparent");
+        this.fillColor("none");
     }
 
     path(path: number[]): this {
-        this.innerSvg.setAttribute("d", toPath(path));
+        this.setAttribute("d", toPath(path));
         return this;
     }
-    is<T extends keyof SvgType>(type: T): this is SvgType[T] {
-        return type === "path"
-    }
+    
 }

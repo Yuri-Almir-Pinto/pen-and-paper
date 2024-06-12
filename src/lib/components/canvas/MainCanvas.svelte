@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
+  import { onMount } from "svelte";
   import CanvasController from "./Controllers/CanvasController";
 
   let SVG: SVGElement;
@@ -15,18 +15,13 @@
 </script>
 
 <div id="app" bind:this={app}>
-  <!-- <div id="toolbox">
-    <ul>
-      <li><button data-interaction="Move" class="selected" tabindex="-1" on:click={interactionButtonClicked}>Move</button></li>
-      <li><button data-interaction="DrawLine" tabindex="-1" on:click={interactionButtonClicked}>Line</button></li>
-      <li><button data-interaction="DrawSquare" tabindex="-1" on:click={interactionButtonClicked}>Square</button></li>
-      <li><button data-interaction="DrawCircle" tabindex="-1" on:click={interactionButtonClicked}>Circle</button></li>
-    </ul>
-  </div>
-  <div id="options">
-    <input type="range" min="1" max="100" value="50">
-  </div> -->
-  <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" bind:this={SVG}>
+  <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" bind:this={SVG} name="canvasOriginSvg">
+    <style>
+      .selected {
+        padding: 3px;
+        outline: 2px solid cyan;
+      }
+    </style>
     <rect width="100" height="100" x="50" y="50"/>
   </svg>
 </div>
@@ -36,49 +31,5 @@
     width: 100%;
     height: 100%;
     position: relative;
-  }
-
-  #toolbox, #options {
-    border: 1px solid gray;
-    position: absolute;
-    border-radius: 10px;
-    background-color: white;
-    padding: 15px;
-  }
-
-  #toolbox {
-    left: 50%;
-    top: 10px;
-    transform: translateX(-50%);
-  }
-
-    #toolbox ul {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 0;
-      margin: 0;
-    }
-
-    #toolbox ul {
-      list-style: none;
-    }
-
-    #toolbox ul button {
-      display: inline;
-      cursor: pointer;
-      border: 1px solid gray;
-      padding: 2px 6px;
-      border-radius: 5px;
-    }
-
-  #options {
-    left: 10px;
-    bottom: 10px;
-  }
-
-  .selected {
-    background-color: rgba(200, 255, 255, 0.6);
   }
 </style>

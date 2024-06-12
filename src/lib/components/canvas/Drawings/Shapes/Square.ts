@@ -3,6 +3,7 @@ import type { NewDrawingCanvasInfo, NewDrawingMouseInfo } from "../../Commands/I
 import { CommandType } from "../../Commands/Types";
 import { BaseDrawing } from "../BaseDrawing";
 import { SvgSquare } from "../SvgTools/SvgSquare";
+import type { SelectSvgBoxRect } from "../SvgTools/Types";
 
 export class Square extends BaseDrawing<SvgSquare> {
     private _originX!: number
@@ -27,10 +28,8 @@ export class Square extends BaseDrawing<SvgSquare> {
                 case command.is(CommandType.ProgressDrawing):
                     const newWidth = command.svgX - command.prevSvgX;
                     const newHeight = command.svgY - command.prevSvgY;
-                    if (command.temporary === true)
-                        this.svg.size(newWidth, newHeight, this._originX, this._originY);
-                    else
-                        this.setSize(newWidth, newHeight);
+                    
+                    this.setSize(newWidth, newHeight);
                     break;
             }
         }
@@ -47,20 +46,29 @@ export class Square extends BaseDrawing<SvgSquare> {
         return drawing;
     }
 
-    protected setOrigin(newOriginX: number, newOriginY: number) {
+    setOrigin(newOriginX: number, newOriginY: number) {
         this._originX = newOriginX;
         this._originY = newOriginY;
         this.svg.origin(newOriginX, newOriginY);
     }
 
-    protected setSize(newWidth: number, newHeight: number) {
+    setSize(newWidth: number, newHeight: number) {
         this._width = newWidth;
         this._height = newHeight;
         this.svg.size(this._width, this._height, this._originX, this._originY);
     }
 
-    protected setBorderRadius(newBorderRadius: number) {
+    setBorderRadius(newBorderRadius: number) {
         this._borderRadius = newBorderRadius;
         this.svg.borderRadius(this._borderRadius);
+    }
+
+    protected getBoundingBox(): SelectSvgBoxRect {
+        return {
+            x: this._originX,
+            y: this._originY,
+            width: this._width,
+            height: this._height
+        }
     }
 }

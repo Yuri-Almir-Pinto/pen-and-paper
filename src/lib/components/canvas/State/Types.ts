@@ -1,4 +1,6 @@
 import type { Interaction } from "../Controllers/Types";
+import type { BaseDrawing } from "../Drawings/BaseDrawing";
+import type { BaseSvg } from "../Drawings/SvgTools/BaseSvg";
 
 export enum ButtonState {
     None, Pressed, Held, Released
@@ -72,7 +74,8 @@ export interface KeyboardDTO {
 
 export enum Key {
     Space = " ", 
-    Escape = "Escape"
+    Escape = "ESCAPE",
+    KeyN = "N"
 }
 
 export interface MouseDTO {
@@ -87,6 +90,7 @@ export interface MouseDTO {
     readonly prevSvgX: number
     readonly prevSvgY: number
     readonly isLeftClick: boolean
+    readonly target?: Readonly<BaseDrawing<BaseSvg>>
 }
 
 export interface CombinedDTO {
